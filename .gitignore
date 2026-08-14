@@ -216,3 +216,49 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ============================================================
+# Complemento ao template Python padrao
+# ============================================================
+
+# ---------- Ambientes virtuais ----------
+.venv/
+venv/
+
+# ---------- Ferramentas de qualidade ----------
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ---------- Node / Frontend ----------
+node_modules/
+dist/
+build/
+.vite/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------- Segredos e ambiente (RNF04) ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Banco de dados local (SQLite) ----------
+*.db
+*.sqlite
+*.sqlite3
+
+# ---------- Saidas geradas em runtime ----------
+backend/output/
+*.generated.xml
+
+# ---------- Editores e sistema operacional ----------
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.DS_Store
+Thumbs.db
