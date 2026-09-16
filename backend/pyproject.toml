@@ -13,6 +13,10 @@ dependencies = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.29",
     "pydantic>=2.6",
+    "sqlalchemy[asyncio]>=2.0",
+    "alembic>=1.13",
+    "pydantic-settings>=2.2",
+    "asyncmy>=0.2.9",
 ]
 
 [project.optional-dependencies]
