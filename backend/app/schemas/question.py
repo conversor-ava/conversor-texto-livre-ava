@@ -1,66 +1,135 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 MIN_ALTERNATIVAS = 2
 MAX_ALTERNATIVAS = 8
 
 
 class AnswerSchema(BaseModel):
-    text: str = Field(..., min_length=1, description="Texto da alternativa")
-    is_correct: bool = Field(..., description="Indica se esta e a alternativa correta")
+    text: str = Field(
+        ...,
+        min_length=1,
+        description="Texto da alternativa"
+    )
+
+    is_correct: bool = Field(
+        ...,
+        strict=True,
+        description="Indica se a alternativa está correta"
+    )
+
     feedback: str | None = Field(
-        default=None, description="Feedback exibido ao aluno ao escolher esta alternativa"
+        default=None,
+        description="Justificativa da alternativa"
     )
 
     @field_validator("text")
     @classmethod
-    def texto_nao_pode_ser_vazio(cls, value: str) -> str:
-        valor_tratado = value.strip()
-        if not valor_tratado:
-            raise ValueError("O texto da alternativa nao pode ser vazio")
-        return valor_tratado
+    def validar_texto(cls, value: str) -> str:
+        value = value.strip()
+
+        if not value:
+            raise ValueError("A alternativa não pode estar vazia")
+
+        return value
 
 
 class QuestionSchema(BaseModel):
-    name: str = Field(..., min_length=1, max_length=255, description="Identificador curto da questao")
-    text: str = Field(..., min_length=1, description="Enunciado da questao")
+    name: str = Field(
+        ...,
+        min_length=1,
+        max_length=255
+    )
+
+    text: str = Field(
+        ...,
+        min_length=1
+    )
+
     answers: list[AnswerSchema] = Field(
-        ..., min_length=MIN_ALTERNATIVAS, max_length=MAX_ALTERNATIVAS, description="Alternativas da questao"
-    )
-    general_feedback: str | None = Field(
-        default=None, description="Feedback geral exibido apos a resposta do aluno"
-    )
-    category: str | None = Field(
-        default=None, description="Categoria/topico da questao dentro do banco Moodle"
+        ...,
+        min_length=MIN_ALTERNATIVAS,
+        max_length=MAX_ALTERNATIVAS
     )
 
-    @field_validator("text")
+    general_feedback: str | None = None
+
+    category: str | None = None
+
+    @field_validator("name", "text")
     @classmethod
-    def enunciado_nao_pode_ser_vazio(cls, value: str) -> str:
-        valor_tratado = value.strip()
-        if not valor_tratado:
-            raise ValueError("O enunciado da questao nao pode ser vazio")
-        return valor_tratado
+    def validar_campos_obrigatorios(cls, value: str) -> str:
+        value = value.strip()
+
+        if not value:
+            raise ValueError("O campo não pode estar vazio")
+
+        return value
 
     @model_validator(mode="after")
-    def deve_ter_exatamente_uma_alternativa_correta(self) -> "QuestionSchema":
-        total_corretas = sum(1 for alternativa in self.answers if alternativa.is_correct)
-        if total_corretas != 1:
+    def validar_alternativas(self) -> QuestionSchema:
+        corretas = sum(
+            alternativa.is_correct
+            for alternativa in self.answers
+        )
+
+        if corretas != 1:
             raise ValueError(
-                f"A questao deve ter exatamente 1 alternativa correta, encontradas {total_corretas}"
+                "Cada questão deve possuir exatamente uma alternativa correta"
             )
-        return self
 
-    @model_validator(mode="after")
-    def alternativas_nao_podem_ser_duplicadas(self) -> "QuestionSchema":
-        textos_normalizados = [alternativa.text.strip().lower() for alternativa in self.answers]
-        if len(textos_normalizados) != len(set(textos_normalizados)):
-            raise ValueError("As alternativas de uma mesma questao nao podem ter textos duplicados")
+        textos = [
+            alternativa.text.casefold()
+            for alternativa in self.answers
+        ]
+
+        if len(textos) != len(set(textos)):
+            raise ValueError(
+                "A questão contém alternativas duplicadas"
+            )
+
         return self
 
 
 class QuestionSetSchema(BaseModel):
     questions: list[QuestionSchema] = Field(
-        ..., min_length=1, description="Lista de questoes geradas a partir do texto-base"
+        ...,
+        min_length=1
     )
+
+    @model_validator(mode="after")
+    def validar_parametros(self, info: ValidationInfo) -> QuestionSetSchema:
+        contexto = info.context or {}
+
+        quantidade_questoes = contexto.get("quantidade_questoes")
+        quantidade_alternativas = contexto.get("quantidade_alternativas")
+
+        if quantidade_questoes is not None:
+            if len(self.questions) != quantidade_questoes:
+                raise ValueError(
+                    f"Esperadas {quantidade_questoes} questões, "
+                    f"recebidas {len(self.questions)}"
+                )
+
+        if quantidade_alternativas is not None:
+            if not MIN_ALTERNATIVAS <= quantidade_alternativas <= MAX_ALTERNATIVAS:
+                raise ValueError(
+                    "A quantidade de alternativas solicitada é inválida"
+                )
+
+            for indice, questao in enumerate(self.questions, start=1):
+                if len(questao.answers) != quantidade_alternativas:
+                    raise ValueError(
+                        f"Questão {indice}: esperadas "
+                        f"{quantidade_alternativas} alternativas, "
+                        f"recebidas {len(questao.answers)}"
+                    )
+
+        return self
