@@ -32,6 +32,7 @@ class Questao(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     nome: Mapped[str] = mapped_column(String(255))
     enunciado: Mapped[str] = mapped_column(Text)
+    categoria: Mapped[str | None] = mapped_column(String(255))
     tipo: Mapped[str] = mapped_column(Text)
     geracao_id: Mapped[int] = mapped_column(ForeignKey("geracoes.id", ondelete="CASCADE"))
     geracao: Mapped["Geracao"] = relationship(back_populates="questoes")
