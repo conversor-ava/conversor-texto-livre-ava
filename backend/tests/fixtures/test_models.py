@@ -29,6 +29,7 @@ def _montar_geracao() -> Geracao:
                 nome=f"Questao-{numero}",
                 enunciado=f"Pergunta {numero}?",
                 categoria="Biologia/Fotossintese" if numero == 1 else None,
+                feedback_geral="Revise o conceito de fotossintese." if numero == 1 else None,
                 tipo="multipla_escolha",
                 alternativas=[
                     Alternativa(texto="Correta", correta=True, justificativa="Esta e a certa."),
@@ -60,9 +61,13 @@ def test_fluxo_completo_geracao_com_questoes_e_alternativas(session):
         assert questao.geracao is geracao
         assert len(questao.alternativas) == 3
         assert sum(a.correta for a in questao.alternativas) == 1 
-        assert questao.nome.startswith("Questao-")
+        
         assert {q.nome: q.categoria for q in geracao.questoes} == {
             "Questao-1": "Biologia/Fotossintese",
+            "Questao-2": None,
+        }
+        assert {q.nome: q.feedback_geral for q in geracao.questoes} == {
+            "Questao-1": "Revise o conceito de fotossintese.",
             "Questao-2": None,
         }
 
