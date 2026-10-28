@@ -26,6 +26,7 @@ def _montar_geracao() -> Geracao:
         parametros={"quantidade_questoes": 2, "dificuldade": "media", "alternativas": 3},
         questoes=[
             Questao(
+                nome=f"Questao-{numero}",
                 enunciado=f"Pergunta {numero}?",
                 tipo="multipla_escolha",
                 alternativas=[
@@ -58,6 +59,7 @@ def test_fluxo_completo_geracao_com_questoes_e_alternativas(session):
         assert questao.geracao is geracao
         assert len(questao.alternativas) == 3
         assert sum(a.correta for a in questao.alternativas) == 1 
+        assert questao.nome.startswith("Questao-")
 
     geracao.status = StatusGeracao.CONCLUIDA
     session.commit()
