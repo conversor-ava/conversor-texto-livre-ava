@@ -50,6 +50,7 @@ def test_convert_returns_valid_moodle_xml() -> None:
 
     assert response.status_code == 200
     assert "application/xml" in response.headers["content-type"]
+    assert "questoes_moodle.xml" in response.headers["content-disposition"]
 
     root = ET.fromstring(response.content)
 
