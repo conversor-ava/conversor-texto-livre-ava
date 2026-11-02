@@ -17,14 +17,16 @@ def criar_questao_valida() -> dict:
             {
                 "name": "Capital do Brasil",
                 "text": "Qual é a capital do Brasil?",
-                "answers": [
+                                "answers": [
                     {
                         "text": "Brasília",
                         "is_correct": True,
+                        "feedback": "Brasília é a capital do Brasil.",
                     },
                     {
                         "text": "Rio de Janeiro",
                         "is_correct": False,
+                        "feedback": "O Rio de Janeiro foi capital até 1960.",
                     },
                 ],
                 "general_feedback": "Brasília é a capital do Brasil.",
