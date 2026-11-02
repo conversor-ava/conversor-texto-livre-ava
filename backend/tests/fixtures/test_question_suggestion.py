@@ -4,7 +4,10 @@ import pytest
 from pydantic import ValidationError
 
 from app.llm.base import LLMProvider
-from app.services.question_suggestion import suggest_questions
+from app.services.question_suggestion import (
+    _remove_markdown_fence,
+    suggest_questions,
+)
 
 
 class FakeProvider(LLMProvider):
@@ -123,3 +126,95 @@ async def test_suggest_questions_rejects_invalid_parameters() -> None:
         )
 
     assert provider.prompts == []
+
+
+@pytest.mark.asyncio
+async def test_suggest_questions_accepts_json_markdown() -> None:
+    resposta = f"```json\n{criar_resposta()}\n```"
+    provider = FakeProvider(resposta)
+
+    result = await suggest_questions(
+        texto="Python é uma linguagem de programação.",
+        quantidade=1,
+        dificuldade="facil",
+        alternativas=4,
+        provider=provider,
+    )
+
+    assert len(result.questions) == 1
+    assert len(result.questions[0].answers) == 4
+    assert all(answer.feedback for answer in result.questions[0].answers)
+
+
+@pytest.mark.asyncio
+async def test_suggest_questions_accepts_markdown_without_language() -> None:
+    resposta = f"```\n{criar_resposta()}\n```"
+    provider = FakeProvider(resposta)
+
+    result = await suggest_questions(
+        texto="Python é uma linguagem de programação.",
+        quantidade=1,
+        dificuldade="facil",
+        alternativas=4,
+        provider=provider,
+    )
+
+    assert len(result.questions) == 1
+    assert len(result.questions[0].answers) == 4
+
+
+@pytest.mark.asyncio
+async def test_suggest_questions_rejects_missing_feedback() -> None:
+    resposta = json.loads(criar_resposta())
+    del resposta["questions"][0]["answers"][0]["feedback"]
+
+    provider = FakeProvider(json.dumps(resposta))
+
+    with pytest.raises(ValidationError):
+        await suggest_questions(
+            texto="Python é uma linguagem de programação.",
+            quantidade=1,
+            dificuldade="facil",
+            alternativas=4,
+            provider=provider,
+        )
+
+
+@pytest.mark.parametrize(
+    ("resposta", "esperado"),
+    [
+        (
+            '{"questions":[]}',
+            '{"questions":[]}',
+        ),
+        (
+            '```json\n{"questions":[]}\n```',
+            '{"questions":[]}',
+        ),
+        (
+            '```\n{"questions":[]}\n```',
+            '{"questions":[]}',
+        ),
+        (
+            '  ```JSON\n{"questions":[]}\n```  ',
+            '{"questions":[]}',
+        ),
+    ],
+)
+def test_remove_markdown_fence(
+    resposta: str,
+    esperado: str,
+) -> None:
+    assert _remove_markdown_fence(resposta) == esperado
+
+
+def test_remove_markdown_fence_preserves_invalid_content() -> None:
+    resposta = "Resposta inválida"
+
+    assert _remove_markdown_fence(resposta) == resposta
+
+
+def test_remove_markdown_fence_preserves_extra_text() -> None:
+    resposta = 'Explicação:\n```json\n{"questions":[]}\n```'
+
+    assert _remove_markdown_fence(resposta) == resposta

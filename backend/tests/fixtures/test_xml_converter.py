@@ -12,8 +12,8 @@ def _question_set_basico(category: str | None = None) -> QuestionSetSchema:
                 "text": "Qual e a capital da Franca?",
                 "answers": [
                     {"text": "Paris", "is_correct": True, "feedback": "Correto!"},
-                    {"text": "Londres", "is_correct": False},
-                    {"text": "Berlim", "is_correct": False},
+                    {"text": "Londres", "is_correct": False, "feedback": "Incorreto!"},
+                    {"text": "Berlim", "is_correct": False, "feedback": "Incorreto!"},
                 ],
                 "general_feedback": "A capital da Franca e Paris.",
                 "category": category,
@@ -89,8 +89,8 @@ def test_categoria_repetida_nao_duplica_elemento() -> None:
                 "name": "q1",
                 "text": "Pergunta 1?",
                 "answers": [
-                    {"text": "A", "is_correct": True},
-                    {"text": "B", "is_correct": False},
+                    {"text": "A", "is_correct": True, "feedback": "Correto!"},
+                    {"text": "B", "is_correct": False, "feedback": "Incorreto!"},
                 ],
                 "category": "Mesma Categoria",
             },
@@ -98,8 +98,8 @@ def test_categoria_repetida_nao_duplica_elemento() -> None:
                 "name": "q2",
                 "text": "Pergunta 2?",
                 "answers": [
-                    {"text": "C", "is_correct": True},
-                    {"text": "D", "is_correct": False},
+                    {"text": "C", "is_correct": True, "feedback": "Correto!"},
+                    {"text": "D", "is_correct": False, "feedback": "Incorreto!"},
                 ],
                 "category": "Mesma Categoria",
             },

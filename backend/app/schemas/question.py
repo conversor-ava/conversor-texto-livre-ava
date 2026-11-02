@@ -25,12 +25,13 @@ class AnswerSchema(BaseModel):
         description="Indica se a alternativa está correta"
     )
 
-    feedback: str | None = Field(
-        default=None,
+    feedback: str = Field(
+        ...,
+        min_length=1,
         description="Justificativa da alternativa"
     )
 
-    @field_validator("text")
+    @field_validator("text", "feedback")
     @classmethod
     def validar_texto(cls, value: str) -> str:
         value = value.strip()
@@ -61,7 +62,7 @@ class QuestionSchema(BaseModel):
 
     general_feedback: str | None = None
 
-    category: str | None = None
+    category: str | None = Field(default=None, max_length=255)
 
     @field_validator("name", "text")
     @classmethod

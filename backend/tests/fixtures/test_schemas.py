@@ -6,9 +6,9 @@ from app.schemas import AnswerSchema, QuestionSchema, QuestionSetSchema
 
 def _alternativas_validas() -> list[dict]:
     return [
-        {"text": "Paris", "is_correct": True},
-        {"text": "Londres", "is_correct": False},
-        {"text": "Berlim", "is_correct": False},
+        {"text": "Paris", "is_correct": True, "feedback": "Paris é a capital da França."},
+        {"text": "Londres", "is_correct": False, "feedback": "Londres é a capital do Reino Unido."},
+        {"text": "Berlim", "is_correct": False, "feedback": "Berlim é a capital da Alemanha."},
     ]
 
 
@@ -30,7 +30,7 @@ def test_questao_valida_e_aceita() -> None:
 
 
 def test_alternativa_remove_espacos() -> None:
-    alternativa = AnswerSchema(text="  Paris  ", is_correct=True)
+    alternativa = AnswerSchema(text="  Paris  ", is_correct=True, feedback="Paris é a capital da França.")
 
     assert alternativa.text == "Paris"
 
@@ -134,3 +134,30 @@ def test_conjunto_aceita_quantidades_solicitadas() -> None:
 def test_conjunto_rejeita_lista_vazia() -> None:
     with pytest.raises(ValidationError):
         QuestionSetSchema.model_validate({"questions": []})
+
+def test_alternativa_exige_feedback() -> None:
+    with pytest.raises(ValidationError) as erro:
+        AnswerSchema(text="Paris", is_correct=True)
+
+    assert erro.value.errors()[0]["loc"] == ("feedback",)
+
+
+@pytest.mark.parametrize("feedback", ["", "   "])
+def test_alternativa_rejeita_feedback_em_branco(feedback: str) -> None:
+    with pytest.raises(ValidationError) as erro:
+        AnswerSchema(text="Paris", is_correct=True, feedback=feedback)
+
+    assert erro.value.errors()[0]["loc"] == ("feedback",)
+
+
+def test_questao_aceita_category_com_255_caracteres() -> None:
+    questao = QuestionSchema(**_questao_valida(), category="c" * 255)
+
+    assert len(questao.category) == 255
+
+
+def test_questao_rejeita_category_com_mais_de_255_caracteres() -> None:
+    with pytest.raises(ValidationError) as erro:
+        QuestionSchema(**_questao_valida(), category="c" * 256)
+
+    assert erro.value.errors()[0]["loc"] == ("category",)
