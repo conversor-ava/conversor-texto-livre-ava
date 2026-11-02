@@ -1,6 +1,7 @@
 import enum
 from datetime import datetime
 
+from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy import JSON, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -15,7 +16,7 @@ class Geracao(Base):
     __tablename__ = "geracoes"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    texto_base: Mapped[str] = mapped_column(Text)
+    texto_base: Mapped[str] = mapped_column(Text().with_variant(LONGTEXT(), "mysql"))
     parametros: Mapped[dict] = mapped_column(JSON)
     data_hora: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     status: Mapped[StatusGeracao] = mapped_column(default=StatusGeracao.PENDENTE)
