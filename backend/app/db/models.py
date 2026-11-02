@@ -34,7 +34,7 @@ class Questao(Base):
     enunciado: Mapped[str] = mapped_column(Text)
     categoria: Mapped[str | None] = mapped_column(String(255))
     feedback_geral: Mapped[str | None] = mapped_column(Text)
-    tipo: Mapped[str] = mapped_column(Text)
+    tipo: Mapped[str] = mapped_column(String(50), default="multipla_escolha")
     geracao_id: Mapped[int] = mapped_column(ForeignKey("geracoes.id", ondelete="CASCADE"))
     geracao: Mapped["Geracao"] = relationship(back_populates="questoes")
     
