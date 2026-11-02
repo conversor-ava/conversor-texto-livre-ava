@@ -3,6 +3,8 @@ import logging
 from fastapi import FastAPI, HTTPException, Response
 from pydantic import BaseModel, Field, ValidationError
 
+from app.api.document_routes import router as document_router
+from app.api.rag_routes import router as rag_router
 from app.llm.base import LLMGenerationError
 from app.llm.providers.ollama import OllamaProvider
 from app.schemas import QuestionSetSchema
@@ -21,6 +23,9 @@ app = FastAPI(
     ),
     version="0.1.0",
 )
+
+app.include_router(document_router)
+app.include_router(rag_router)
 
 
 class SuggestionRequest(BaseModel):
