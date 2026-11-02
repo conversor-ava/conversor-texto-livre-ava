@@ -6,9 +6,9 @@ from app.schemas import AnswerSchema, QuestionSchema, QuestionSetSchema
 
 def _alternativas_validas() -> list[dict]:
     return [
-        {"text": "Paris", "is_correct": True},
-        {"text": "Londres", "is_correct": False},
-        {"text": "Berlim", "is_correct": False},
+        {"text": "Paris", "is_correct": True, "feedback": "Paris é a capital da França."},
+        {"text": "Londres", "is_correct": False, "feedback": "Londres é a capital do Reino Unido."},
+        {"text": "Berlim", "is_correct": False, "feedback": "Berlim é a capital da Alemanha."},
     ]
 
 
@@ -30,7 +30,7 @@ def test_questao_valida_e_aceita() -> None:
 
 
 def test_alternativa_remove_espacos() -> None:
-    alternativa = AnswerSchema(text="  Paris  ", is_correct=True)
+    alternativa = AnswerSchema(text="  Paris  ", is_correct=True, feedback="Paris é a capital da França.")
 
     assert alternativa.text == "Paris"
 
