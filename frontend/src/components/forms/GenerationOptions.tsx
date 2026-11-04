@@ -18,20 +18,20 @@ const modes: {
 }[] = [
   {
     value: 'manual',
-    title: 'Manual',
-    subtitle: 'Sem inteligência artificial',
+    title: 'Criar manualmente',
+    subtitle: 'Escreva suas próprias questões',
     Icon: Pencil
   },
   {
     value: 'simple',
-    title: 'IA simples',
-    subtitle: 'Sugestões com Ollama',
+    title: 'Receber sugestões',
+    subtitle: 'A IA sugere questões a partir do seu texto',
     Icon: Sparkles
   },
   {
     value: 'rag',
-    title: 'IA + RAG',
-    subtitle: 'Busca semântica + Ollama',
+    title: 'Sugestões direcionadas',
+    subtitle: 'A IA busca informações relevantes no material',
     Icon: BrainCircuit
   }
 ]
@@ -48,10 +48,11 @@ export function GenerationOptions() {
         </div>
 
         <div>
-          <h2>Como criar as questões?</h2>
+          <h2>Deseja incluir questões no seu material?</h2>
 
           <p>
-            Escolha a forma de trabalho. A IA é opcional.
+            A criação de questões é opcional. Se desejar
+            incluí-las, escolha como prefere trabalhar.
           </p>
         </div>
       </div>
@@ -59,7 +60,7 @@ export function GenerationOptions() {
       <div
         className="mode-grid"
         role="group"
-        aria-label="Modo de criação"
+        aria-label="Forma de criação de questões"
       >
         {modes.map(({ value, title, subtitle, Icon }) => (
           <button
@@ -84,7 +85,7 @@ export function GenerationOptions() {
         <div className="options-fields">
           <div className="control-row">
             <label htmlFor="quantity">
-              Quantidade de questões
+              Quantas questões deseja receber?
             </label>
 
             <input
@@ -106,7 +107,7 @@ export function GenerationOptions() {
 
           <div className="control-row">
             <label htmlFor="difficulty">
-              Dificuldade
+              Nível de dificuldade
             </label>
 
             <select
@@ -155,7 +156,7 @@ export function GenerationOptions() {
         {config.mode === 'rag' && (
           <div className="control-row">
             <label htmlFor="top-k">
-              Trechos recuperados (Top-K)
+              Quantos trechos do material consultar?
             </label>
 
             <input
@@ -180,7 +181,7 @@ export function GenerationOptions() {
       {config.mode === 'rag' && (
         <div className="control-row full">
           <label htmlFor="rag-topic">
-            Tema para busca semântica
+            Sobre qual assunto deseja criar questões?
           </label>
 
           <input
@@ -191,15 +192,15 @@ export function GenerationOptions() {
                 topic: event.target.value
               })
             }
-            placeholder="Ex.: fotossíntese e cloroplastos"
+            placeholder="Ex.: fotossíntese, Revolução Industrial, matemática..."
           />
         </div>
       )}
 
       <div className="notice-box">
         {isAI
-          ? 'O Ollama precisa estar em execução para sugerir questões. Você sempre poderá revisar o resultado.'
-          : 'Neste modo, você pode criar, editar e exportar questões sem Ollama e sem RAG.'}
+          ? 'A inteligência artificial utilizará seu material para sugerir questões. Você poderá revisar e modificar todas elas antes de finalizar.'
+          : 'Você pode escrever suas próprias questões, com total liberdade para editar os enunciados, as alternativas e as respostas.'}
       </div>
     </section>
   )

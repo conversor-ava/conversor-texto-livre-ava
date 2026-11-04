@@ -1,76 +1,130 @@
 import { useEffect, useState } from 'react'
 import {
   BookOpen,
-  CircleCheck,
-  FileCode2,
   FileText,
   GraduationCap,
   LayoutDashboard,
   Menu,
+  Moon,
   ShieldCheck,
+  Sun,
   X
 } from 'lucide-react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { health } from '../../services/api'
+import {
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate
+} from 'react-router-dom'
 import { useEvaluation } from '../../hooks/useEvaluation'
 import { Toast } from '../ui/Toast'
 
-const sections = [
-  {
-    to: '/',
-    label: 'Preparar material',
-    Icon: FileText
-  },
-  {
-    to: '/revisao',
-    label: 'Revisar questões',
-    Icon: CircleCheck
-  },
-  {
-    to: '/exportacao',
-    label: 'Exportar Moodle XML',
-    Icon: FileCode2
-  }
+type Theme = 'light' | 'dark'
+
+const THEME_STORAGE_KEY = 'ava-studio-theme'
+
+const developers = [
+  'Kayo dos Santos Tavares de Castro Lima',
+  'Luis Filipe Soares Lima',
+  'Mellani lyvian de Macedo dos Santos',
+  'Maria Eduarda Franklin Barbosa'
 ]
 
+function getSavedTheme(): Theme | null {
+  try {
+    const savedTheme = localStorage.getItem(THEME_STORAGE_KEY)
+
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      return savedTheme
+    }
+  } catch {
+    // O sistema continua funcionando se o armazenamento estiver indisponível.
+  }
+
+  return null
+}
+
+function getSystemTheme(): Theme {
+  if (
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-color-scheme: dark)').matches
+  ) {
+    return 'dark'
+  }
+
+  return 'light'
+}
+
+function getInitialTheme(): Theme {
+  return getSavedTheme() ?? getSystemTheme()
+}
+
 export function AppLayout() {
-  const [online, setOnline] = useState<boolean | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const { questions, reset, notice, dismiss } = useEvaluation()
+  const [theme, setTheme] = useState<Theme>(getInitialTheme)
+
+  const { reset, notice, dismiss } = useEvaluation()
+
   const navigate = useNavigate()
+  const location = useLocation()
 
+  const pageTitle =
+    location.pathname === '/revisao'
+      ? 'Revisar material'
+      : location.pathname === '/exportacao'
+        ? 'Finalizar material'
+        : 'Preparar material'
+
+  // Aplica o tema escolhido à página.
   useEffect(() => {
-    let active = true
-    let checking = false
+    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.style.colorScheme = theme
+  }, [theme])
 
-    async function checkConnection() {
-      if (checking) return
+  // Acompanha as mudanças do tema do sistema operacional
+  // enquanto o usuário não tiver definido uma preferência.
+  useEffect(() => {
+    if (!window.matchMedia) {
+      return
+    }
 
-      checking = true
+    const mediaQuery = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    )
 
-      try {
-        const connected = await health()
-
-        if (active) {
-          setOnline(connected)
-        }
-      } finally {
-        checking = false
+    function handleSystemThemeChange(event: MediaQueryListEvent) {
+      if (getSavedTheme() === null) {
+        setTheme(event.matches ? 'dark' : 'light')
       }
     }
 
-    void checkConnection()
-
-    const interval = window.setInterval(() => {
-      void checkConnection()
-    }, 30000)
+    mediaQuery.addEventListener(
+      'change',
+      handleSystemThemeChange
+    )
 
     return () => {
-      active = false
-      window.clearInterval(interval)
+      mediaQuery.removeEventListener(
+        'change',
+        handleSystemThemeChange
+      )
     }
   }, [])
+
+  function toggleTheme() {
+    const nextTheme: Theme =
+      theme === 'light' ? 'dark' : 'light'
+
+    setTheme(nextTheme)
+
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme)
+    } catch {
+      // A alternância funciona durante a sessão,
+      // mesmo que não seja possível salvar a preferência.
+    }
+  }
 
   function startOver() {
     reset()
@@ -114,35 +168,26 @@ export function AppLayout() {
           onClick={startOver}
         >
           <LayoutDashboard size={19} />
-          Nova avaliação
+          Novo material
         </button>
 
         <p className="nav-caption section-caption">
-          CRIAR AVALIAÇÃO
+          SEU MATERIAL
         </p>
 
-        <nav aria-label="Etapas do conversor">
-          {sections.map(({ to, label, Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/'}
-              onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `nav-item ${isActive ? 'active' : ''}`
-              }
-            >
-              <Icon size={19} />
+        <nav aria-label="Navegação do conversor">
+          <NavLink
+            to="/"
+            end
+            onClick={() => setMenuOpen(false)}
+            className={({ isActive }) =>
+              `nav-item ${isActive ? 'active' : ''}`
+            }
+          >
+            <FileText size={19} />
 
-              {label}
-
-              {to === '/revisao' && questions.length > 0 && (
-                <span className="nav-count">
-                  {questions.length}
-                </span>
-              )}
-            </NavLink>
-          ))}
+            Preparar material
+          </NavLink>
         </nav>
 
         <div className="sidebar-spacer" />
@@ -155,30 +200,10 @@ export function AppLayout() {
           </strong>
 
           <p>
-            Você tem controle sobre cada questão.
-            O uso da IA é sempre opcional.
+            Prepare seus materiais didáticos com liberdade.
+            Você decide se deseja incluir questões e
+            utilizar inteligência artificial.
           </p>
-        </div>
-
-        <div className="api-status">
-          <span
-            className={`connection-dot ${
-              online === true
-                ? 'online'
-                : online === false
-                  ? 'offline'
-                  : ''
-            }`}
-          />
-
-          <span>
-            FastAPI{' '}
-            {online === null
-              ? 'verificando'
-              : online
-                ? 'conectado'
-                : 'desconectado'}
-          </span>
         </div>
       </aside>
 
@@ -212,13 +237,38 @@ export function AppLayout() {
             </span>
 
             <strong>
-              Nova avaliação
+              {pageTitle}
             </strong>
           </div>
 
-          <div className="topbar-badge">
-            <ShieldCheck size={15} />
-            IA opcional
+          <div className="topbar-actions">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={
+                theme === 'light'
+                  ? 'Ativar modo escuro'
+                  : 'Ativar modo claro'
+              }
+              title={
+                theme === 'light'
+                  ? 'Ativar modo escuro'
+                  : 'Ativar modo claro'
+              }
+              aria-pressed={theme === 'dark'}
+            >
+              {theme === 'light' ? (
+                <Moon size={19} />
+              ) : (
+                <Sun size={19} />
+              )}
+            </button>
+
+            <div className="topbar-badge">
+              <ShieldCheck size={15} />
+              IA opcional
+            </div>
           </div>
         </header>
 
@@ -226,14 +276,40 @@ export function AppLayout() {
           <Outlet />
         </main>
 
-        <footer className="main-footer">
-          <span>
-            AVA Studio · Conversor Inteligente Texto Livre para AVA
-          </span>
+        <footer className="main-footer academic-footer">
+          <div className="academic-footer-header">
+            <div className="academic-footer-brand">
+              <GraduationCap size={22} />
 
-          <span>
-            Engenharia de Software · Moodle XML
-          </span>
+              <div>
+                <strong>AVA Studio</strong>
+                <span>Projeto acadêmico</span>
+              </div>
+            </div>
+
+            <p className="academic-footer-description">
+              Projeto desenvolvido por estudantes do curso de
+              Engenharia de Software da Universidade de Vassouras.
+            </p>
+          </div>
+
+          <div className="academic-footer-team">
+            <h3>Equipe de desenvolvimento</h3>
+
+            <ul className="academic-footer-members">
+              {developers.map(developer => (
+                <li key={developer}>
+                  {developer}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="academic-footer-bottom">
+            <span>
+              Universidade de Vassouras
+            </span>
+          </div>
         </footer>
       </div>
 

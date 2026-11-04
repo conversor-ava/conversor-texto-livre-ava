@@ -1,3 +1,7 @@
+/* =========================================
+   ESTRUTURA DA PÁGINA
+========================================= */
+
 .review-page {
   width: 100%;
   min-width: 0;
@@ -12,6 +16,10 @@
   line-height: 1.75;
 }
 
+/* =========================================
+   LAYOUT PRINCIPAL
+========================================= */
+
 .review-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 285px;
@@ -25,6 +33,10 @@
   gap: 22px;
   min-width: 0;
 }
+
+/* =========================================
+   BARRA DE REVISÃO
+========================================= */
 
 .review-toolbar {
   display: flex;
@@ -70,11 +82,20 @@
   font-weight: 700;
 }
 
+/* =========================================
+   LISTA DE QUESTÕES
+========================================= */
+
 .review-questions {
   display: flex;
   flex-direction: column;
   gap: 22px;
+  min-width: 0;
 }
+
+/* =========================================
+   ESTADO SEM QUESTÕES
+========================================= */
 
 .review-page .empty-state {
   display: flex;
@@ -104,6 +125,10 @@
   line-height: 1.8;
 }
 
+/* =========================================
+   BOTÕES DE NAVEGAÇÃO
+========================================= */
+
 .review-actions {
   display: flex;
   align-items: center;
@@ -116,12 +141,20 @@
   min-height: 45px;
 }
 
+/* =========================================
+   COLUNA LATERAL
+========================================= */
+
 .review-aside {
   display: flex;
   flex-direction: column;
   gap: 20px;
   min-width: 0;
 }
+
+/* =========================================
+   RESUMO DO MATERIAL
+========================================= */
 
 .review-page .summary-panel {
   padding: 25px;
@@ -166,6 +199,10 @@
   font-weight: 700;
 }
 
+/* =========================================
+   PAINEL DE ORIENTAÇÕES
+========================================= */
+
 .review-guidance {
   padding: 24px;
   background: #f0f6f5;
@@ -199,10 +236,77 @@
   margin-bottom: 0;
 }
 
+/* =========================================
+   ACESSIBILIDADE
+========================================= */
+
 .review-page a:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
+
+/* =========================================
+   AJUSTES DO TEMA ESCURO
+========================================= */
+
+/* Painel de orientações */
+
+[data-theme='dark'] .review-guidance {
+  background: #20383d;
+  border-color: #345258;
+}
+
+[data-theme='dark'] .review-guidance-heading {
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .review-guidance-heading h3 {
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .review-guidance p {
+  color: var(--color-text-secondary);
+}
+
+/* Contador de questões */
+
+[data-theme='dark'] .review-page .counter {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* Estado sem questões */
+
+[data-theme='dark'] .review-page .empty-state {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme='dark'] .review-page .empty-state > svg {
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .review-page .empty-state h2 {
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .review-page .empty-state p {
+  color: var(--color-text-secondary);
+}
+
+/* Resumo lateral */
+
+[data-theme='dark'] .review-summary-row {
+  border-bottom-color: var(--color-border);
+}
+
+[data-theme='dark'] .review-summary-row strong {
+  color: var(--color-text);
+}
+
+/* =========================================
+   RESPONSIVIDADE — TELAS MÉDIAS
+========================================= */
 
 @media (max-width: 1160px) {
   .review-layout {
@@ -215,6 +319,10 @@
     align-items: start;
   }
 }
+
+/* =========================================
+   RESPONSIVIDADE — CELULARES
+========================================= */
 
 @media (max-width: 730px) {
   .review-page .page-heading h1 {

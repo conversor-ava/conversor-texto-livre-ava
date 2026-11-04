@@ -1,19 +1,31 @@
+/* =========================================
+   ESTRUTURA PRINCIPAL
+========================================= */
+
 .app-shell {
   display: flex;
   min-height: 100vh;
   background: var(--color-background);
 }
 
+/* =========================================
+   MENU LATERAL
+========================================= */
+
 .app-shell .sidebar {
   position: sticky;
   top: 0;
   z-index: 20;
+
   display: flex;
   flex-direction: column;
+
   width: 260px;
   min-width: 260px;
   height: 100vh;
+
   padding: 28px 16px 20px;
+
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
 }
@@ -22,15 +34,18 @@
   display: flex;
   align-items: center;
   gap: 12px;
+
   padding: 4px 12px 34px;
 }
 
 .app-shell .brand-symbol {
   display: grid;
   place-items: center;
+
   width: 42px;
   height: 42px;
   flex-shrink: 0;
+
   background: var(--color-primary);
   border-radius: 9px;
   color: #ffffff;
@@ -38,6 +53,7 @@
 
 .app-shell .sidebar-brand strong {
   display: block;
+
   color: var(--color-text);
   font-family: 'DM Sans', sans-serif;
   font-size: 22px;
@@ -51,16 +67,23 @@
 
 .app-shell .sidebar-brand small {
   display: block;
+
   margin-top: 2px;
+
   color: var(--color-text-secondary);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 1.1px;
 }
 
+/* =========================================
+   NAVEGAÇÃO
+========================================= */
+
 .app-shell .nav-caption {
   margin: 0 0 12px;
   padding: 0 12px;
+
   color: #8492a2;
   font-size: 10px;
   font-weight: 700;
@@ -75,17 +98,22 @@
   display: flex;
   align-items: center;
   gap: 12px;
+
   width: 100%;
   min-height: 44px;
+
   margin: 3px 0;
   padding: 11px 13px;
+
   background: transparent;
   border: 1px solid transparent;
   border-radius: 7px;
+
   color: #59697b;
   font-size: 13px;
   font-weight: 600;
   text-align: left;
+
   transition:
     background 0.15s ease,
     color 0.15s ease,
@@ -109,6 +137,7 @@
 .app-shell .nav-item.active {
   background: var(--color-primary-light);
   border-color: #d5e8e7;
+
   color: var(--color-primary);
   font-weight: 700;
 }
@@ -120,8 +149,10 @@
 .app-shell .nav-count {
   margin-left: auto;
   padding: 3px 8px;
+
   background: #d7eae9;
   border-radius: 5px;
+
   color: var(--color-primary);
   font-size: 11px;
   font-weight: 700;
@@ -132,17 +163,25 @@
   min-height: 24px;
 }
 
+/* =========================================
+   CARD PARA EDUCADORES
+========================================= */
+
 .app-shell .teacher-card {
   padding: 18px;
+
   background: #f0f6f5;
   border: 1px solid #dceae8;
   border-radius: var(--radius-md);
+
   color: var(--color-primary);
 }
 
 .app-shell .teacher-card strong {
   display: block;
+
   margin: 11px 0 6px;
+
   color: #29474b;
   font-size: 13px;
   font-weight: 700;
@@ -150,16 +189,24 @@
 
 .app-shell .teacher-card p {
   margin: 0;
+
   color: #637c81;
   font-size: 12px;
   line-height: 1.6;
 }
 
+/* =========================================
+   INDICADORES DE CONEXÃO
+   Mantidos para compatibilidade
+========================================= */
+
 .app-shell .api-status {
   display: flex;
   align-items: center;
   gap: 9px;
+
   padding: 20px 12px 0;
+
   color: #7d8b9b;
   font-size: 11px;
 }
@@ -168,6 +215,7 @@
   width: 8px;
   height: 8px;
   flex-shrink: 0;
+
   background: #b9c2cd;
   border-radius: 50%;
 }
@@ -180,22 +228,34 @@
   background: var(--color-error);
 }
 
+/* =========================================
+   ÁREA PRINCIPAL
+========================================= */
+
 .app-shell .main-area {
   display: flex;
   flex: 1;
   flex-direction: column;
+
   min-width: 0;
   min-height: 100vh;
 }
+
+/* =========================================
+   CABEÇALHO
+========================================= */
 
 .app-shell .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+
   height: 72px;
   flex-shrink: 0;
+
   padding: 0 42px;
+
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 }
@@ -204,6 +264,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
+
+  min-width: 0;
+
   color: #8592a1;
   font-size: 12px;
 }
@@ -221,14 +284,77 @@
   color: #b8c3cc;
 }
 
+/* =========================================
+   AÇÕES DO CABEÇALHO
+========================================= */
+
+.app-shell .topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   BOTÃO DE ALTERNÂNCIA DO TEMA
+========================================= */
+
+.app-shell .theme-toggle {
+  display: grid;
+  place-items: center;
+
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+
+  padding: 0;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+
+  color: var(--color-text-secondary);
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.app-shell .theme-toggle:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.app-shell .theme-toggle:active {
+  transform: scale(0.95);
+}
+
+.app-shell .theme-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* =========================================
+   INDICADOR IA OPCIONAL
+========================================= */
+
 .app-shell .topbar-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+
   padding: 8px 12px;
+
   background: var(--color-primary-light);
   border: 1px solid #d5e8e7;
   border-radius: var(--radius-sm);
+
   color: var(--color-primary);
   font-size: 11px;
   font-weight: 700;
@@ -239,13 +365,23 @@
   color: var(--color-primary);
 }
 
+/* =========================================
+   CONTEÚDO PRINCIPAL
+========================================= */
+
 .app-shell .main-content {
   flex: 1;
+
   width: 100%;
   max-width: 1360px;
+
   margin: 0 auto;
   padding: 42px;
 }
+
+/* =========================================
+   CABEÇALHO DAS PÁGINAS
+========================================= */
 
 .app-shell .page-heading {
   margin-bottom: 30px;
@@ -255,7 +391,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
+
   margin-bottom: 12px;
+
   color: var(--color-primary);
   font-size: 11px;
   font-weight: 700;
@@ -264,6 +402,7 @@
 
 .app-shell .page-heading h1 {
   margin-bottom: 10px;
+
   color: var(--color-text);
   font-family: 'DM Sans', sans-serif;
   font-size: clamp(27px, 3vw, 36px);
@@ -278,16 +417,23 @@
 
 .app-shell .page-heading p {
   max-width: 720px;
+
   margin-bottom: 0;
+
   color: var(--color-text-secondary);
   font-size: 14px;
   line-height: 1.7;
 }
 
+/* =========================================
+   INDICADOR DE ETAPAS
+========================================= */
+
 .app-shell .step-indicator {
   display: flex;
   align-items: center;
   gap: 12px;
+
   margin-bottom: 30px;
 }
 
@@ -295,6 +441,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
+
   color: #8795a3;
   font-size: 12px;
   font-weight: 600;
@@ -303,11 +450,14 @@
 .app-shell .step-number {
   display: grid;
   place-items: center;
+
   width: 30px;
   height: 30px;
+
   background: #edf0f3;
   border: 1px solid #e0e5e9;
   border-radius: 7px;
+
   color: #708092;
   font-size: 12px;
   font-weight: 700;
@@ -339,18 +489,139 @@
   color: #b2bdc7;
 }
 
+/* =========================================
+   RODAPÉ ACADÊMICO
+========================================= */
+
 .app-shell .main-footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 20px 42px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 24px;
+
+  padding: 30px 42px 20px;
+
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
-  color: #8794a2;
-  font-size: 11px;
+
+  color: var(--color-text-secondary);
+  font-size: 12px;
   line-height: 1.6;
 }
+
+/* =========================================
+   IDENTIFICAÇÃO DO PROJETO
+========================================= */
+
+.app-shell .academic-footer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.app-shell .academic-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+
+  color: var(--color-primary);
+}
+
+.app-shell .academic-footer-brand > svg {
+  flex-shrink: 0;
+}
+
+.app-shell .academic-footer-brand strong,
+.app-shell .academic-footer-brand span {
+  display: block;
+}
+
+.app-shell .academic-footer-brand strong {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.app-shell .academic-footer-brand span {
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.app-shell .academic-footer-description {
+  max-width: 480px;
+
+  margin: 0;
+
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* =========================================
+   EQUIPE DE DESENVOLVIMENTO
+========================================= */
+
+.app-shell .academic-footer-team {
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+.app-shell .academic-footer-team h3 {
+  margin: 0 0 12px;
+
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.app-shell .academic-footer-members {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 360px));
+  justify-content: start;
+
+  column-gap: 36px;
+  row-gap: 12px;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.app-shell .academic-footer-members li {
+  min-width: 0;
+
+  overflow-wrap: anywhere;
+
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+/* =========================================
+   INSTITUIÇÃO
+========================================= */
+
+.app-shell .academic-footer-bottom {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+
+  padding-top: 14px;
+
+  border-top: 1px solid var(--color-border);
+
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+/* =========================================
+   ELEMENTOS MOBILE
+========================================= */
 
 .app-shell .mobile-menu,
 .app-shell .mobile-close,
@@ -358,12 +629,186 @@
   display: none;
 }
 
+/* =========================================
+   ACESSIBILIDADE
+========================================= */
+
 .app-shell .nav-item:focus-visible,
 .app-shell .mobile-menu:focus-visible,
 .app-shell .mobile-close:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
+
+/* =========================================
+   AJUSTES EXCLUSIVOS DO TEMA ESCURO
+========================================= */
+
+[data-theme='dark'] .app-shell .brand-symbol {
+  color: #102229;
+}
+
+[data-theme='dark'] .app-shell .nav-caption {
+  color: #97aab9;
+}
+
+[data-theme='dark'] .app-shell .nav-item {
+  color: var(--color-text-secondary);
+}
+
+[data-theme='dark'] .app-shell .nav-item svg {
+  color: #9aafbd;
+}
+
+[data-theme='dark'] .app-shell .nav-item:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .app-shell .nav-item:hover svg {
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .app-shell .nav-item.active {
+  background: var(--color-primary-light);
+  border-color: #42686e;
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .app-shell .nav-item.active svg {
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .app-shell .nav-count {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* Card para educadores */
+
+[data-theme='dark'] .app-shell .teacher-card {
+  background: #20383d;
+  border-color: #345258;
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .app-shell .teacher-card strong {
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .app-shell .teacher-card p {
+  color: var(--color-text-secondary);
+}
+
+/* Cabeçalho */
+
+[data-theme='dark'] .app-shell .topbar-left {
+  color: var(--color-text-secondary);
+}
+
+[data-theme='dark'] .app-shell .topbar-crumb {
+  color: var(--color-text-secondary);
+}
+
+[data-theme='dark'] .app-shell .breadcrumb-divider {
+  color: #728b9a;
+}
+
+[data-theme='dark'] .app-shell .topbar-badge {
+  background: var(--color-primary-light);
+  border-color: #42686e;
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .app-shell .theme-toggle {
+  background: #22333e;
+  border-color: var(--color-border-strong);
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .app-shell .theme-toggle:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+/* Indicador de etapas */
+
+[data-theme='dark'] .app-shell .step-item {
+  color: var(--color-text-secondary);
+}
+
+[data-theme='dark'] .app-shell .step-number {
+  background: #24343f;
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+[data-theme='dark'] .app-shell .step-item.is-current {
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .app-shell .step-item.is-current .step-number {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #102229;
+}
+
+[data-theme='dark'] .app-shell .step-item.is-done {
+  color: var(--color-success);
+}
+
+[data-theme='dark'] .app-shell .step-item.is-done .step-number {
+  background: #204039;
+  border-color: #345d50;
+  color: var(--color-success);
+}
+
+[data-theme='dark'] .app-shell .step-chevron {
+  color: #718695;
+}
+
+/* Rodapé acadêmico */
+
+[data-theme='dark'] .app-shell .main-footer {
+  background: var(--color-surface);
+  border-top-color: var(--color-border);
+}
+
+[data-theme='dark'] .app-shell .academic-footer-brand strong {
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .app-shell .academic-footer-brand span {
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .app-shell .academic-footer-description,
+[data-theme='dark'] .app-shell .academic-footer-members li,
+[data-theme='dark'] .app-shell .academic-footer-bottom {
+  color: var(--color-text-secondary);
+}
+
+/* Compatibilidade com indicadores existentes */
+
+[data-theme='dark'] .app-shell .api-status {
+  color: var(--color-text-secondary);
+}
+
+[data-theme='dark'] .app-shell .connection-dot {
+  background: var(--color-border-strong);
+}
+
+[data-theme='dark'] .app-shell .connection-dot.online {
+  background: var(--color-success);
+}
+
+[data-theme='dark'] .app-shell .connection-dot.offline {
+  background: var(--color-error);
+}
+
+/* =========================================
+   RESPONSIVIDADE — TELAS MÉDIAS
+========================================= */
 
 @media (max-width: 1160px) {
   .app-shell .sidebar {
@@ -384,17 +829,30 @@
   }
 }
 
+@media (max-width: 1000px) {
+  .app-shell .academic-footer-members {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* =========================================
+   RESPONSIVIDADE — CELULARES
+========================================= */
+
 @media (max-width: 730px) {
   .app-shell .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
+
     width: min(285px, 85vw);
     min-width: 0;
     height: 100dvh;
+
     transform: translateX(-102%);
     transition: transform 0.2s ease;
+
     box-shadow: 10px 0 35px #182b3515;
   }
 
@@ -405,21 +863,27 @@
   .app-shell .mobile-close {
     display: grid;
     place-items: center;
+
     margin-left: auto;
     padding: 7px;
+
     background: transparent;
     border: 0;
     border-radius: var(--radius-sm);
+
     color: #647487;
   }
 
   .app-shell .mobile-menu {
     display: grid;
     place-items: center;
+
     padding: 7px;
+
     background: transparent;
     border: 0;
     border-radius: var(--radius-sm);
+
     color: var(--color-primary);
   }
 
@@ -427,7 +891,9 @@
     position: fixed;
     inset: 0;
     z-index: 15;
+
     display: block;
+
     background: #14252b70;
     border: 0;
   }
@@ -435,10 +901,20 @@
   .app-shell .topbar {
     height: 64px;
     padding: 0 18px;
+    gap: 12px;
   }
 
   .app-shell .topbar-left {
     gap: 9px;
+  }
+
+  .app-shell .topbar-actions {
+    gap: 8px;
+  }
+
+  .app-shell .theme-toggle {
+    width: 36px;
+    height: 36px;
   }
 
   .app-shell .topbar-badge {
@@ -481,16 +957,67 @@
   }
 
   .app-shell .main-footer {
+    gap: 20px;
+    padding: 24px 16px 18px;
+  }
+
+  .app-shell .academic-footer-header {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    padding: 17px 16px;
+    gap: 12px;
+  }
+
+  .app-shell .academic-footer-members {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-shell .academic-footer-bottom {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  [data-theme='dark'] .app-shell .mobile-close {
+    color: var(--color-text-secondary);
   }
 }
 
+/* =========================================
+   RESPONSIVIDADE — TELAS PEQUENAS
+========================================= */
+
+@media (max-width: 420px) {
+  .app-shell .topbar {
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .app-shell .topbar-left {
+    gap: 6px;
+    font-size: 11px;
+  }
+
+  .app-shell .topbar-actions {
+    gap: 6px;
+  }
+
+  .app-shell .theme-toggle {
+    width: 34px;
+    height: 34px;
+  }
+
+  .app-shell .topbar-badge {
+    padding: 7px;
+    font-size: 10px;
+  }
+}
+
+/* =========================================
+   ACESSIBILIDADE — MOVIMENTO REDUZIDO
+========================================= */
+
 @media (prefers-reduced-motion: reduce) {
   .app-shell .sidebar,
-  .app-shell .nav-item {
+  .app-shell .nav-item,
+  .app-shell .theme-toggle {
     transition: none;
   }
 }

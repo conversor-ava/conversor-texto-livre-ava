@@ -18,6 +18,8 @@ export function ReviewPage() {
   const { questions, setQuestions, config, notify } = useEvaluation()
   const navigate = useNavigate()
 
+  const hasQuestions = questions.length > 0
+
   const totalAlternatives = questions.reduce(
     (total, question) => total + question.answers.length,
     0
@@ -25,10 +27,10 @@ export function ReviewPage() {
 
   const generationOrigin =
     config.mode === 'manual'
-      ? 'Manual'
+      ? 'Criação manual'
       : config.mode === 'rag'
-        ? 'IA + RAG'
-        : 'IA simples'
+        ? 'Sugestões com base no material'
+        : 'Sugestões com inteligência artificial'
 
   function add() {
     setQuestions(previous => [
@@ -38,11 +40,13 @@ export function ReviewPage() {
   }
 
   function next() {
-    const error = validateQuestions(questions)
+    if (hasQuestions) {
+      const error = validateQuestions(questions)
 
-    if (error) {
-      notify('error', error)
-      return
+      if (error) {
+        notify('error', error)
+        return
+      }
     }
 
     navigate('/exportacao')
@@ -53,14 +57,15 @@ export function ReviewPage() {
       <header className="page-heading">
         <div className="eyebrow">
           <ClipboardList size={15} />
-          REVISÃO DOCENTE
+          REVISÃO DO MATERIAL
         </div>
 
-        <h1>Revisão das questões</h1>
+        <h1>Revise seu conteúdo</h1>
 
         <p>
-          Confira os enunciados, revise as alternativas e ajuste
-          os feedbacks antes de exportar sua avaliação.
+          Confira seu material antes de finalizar.
+          Se desejar, você também pode adicionar questões
+          para complementar o conteúdo.
         </p>
       </header>
 
@@ -71,7 +76,7 @@ export function ReviewPage() {
           <div className="review-toolbar">
             <div>
               <div className="review-toolbar-title">
-                <h2>Banco de questões</h2>
+                <h2>Questões do material</h2>
 
                 <span className="counter">
                   {questions.length}
@@ -79,7 +84,9 @@ export function ReviewPage() {
               </div>
 
               <p>
-                Edite e organize as questões da sua avaliação.
+                A inclusão de questões é opcional.
+                Você pode adicioná-las, editá-las ou continuar
+                sem criar nenhuma.
               </p>
             </div>
 
@@ -89,20 +96,22 @@ export function ReviewPage() {
               onClick={add}
             >
               <Plus size={17} />
-              Nova questão
+              Adicionar questão
             </button>
           </div>
 
           <div className="review-questions">
-            {questions.length === 0 && (
+            {!hasQuestions && (
               <section className="panel empty-state">
                 <ClipboardList size={36} />
 
-                <h2>Nenhuma questão ainda</h2>
+                <h2>Deseja adicionar questões?</h2>
 
                 <p>
-                  Você pode criar uma questão agora mesmo,
-                  sem IA, ou voltar à preparação do material.
+                  Você pode complementar seu material com
+                  perguntas e respostas, mas isso não é
+                  obrigatório. Se preferir, continue sem
+                  adicionar questões.
                 </p>
 
                 <button
@@ -111,7 +120,7 @@ export function ReviewPage() {
                   onClick={add}
                 >
                   <Plus size={17} />
-                  Criar questão
+                  Adicionar questão
                 </button>
               </section>
             )}
@@ -138,10 +147,18 @@ export function ReviewPage() {
               type="button"
               className="button button-primary"
               onClick={next}
-              disabled={questions.length === 0}
             >
-              <CheckCheck size={18} />
-              Validar e continuar
+              {hasQuestions ? (
+                <>
+                  <CheckCheck size={18} />
+                  Conferir e continuar
+                </>
+              ) : (
+                <>
+                  Continuar sem questões
+                </>
+              )}
+
               <ArrowRight size={17} />
             </button>
           </div>
@@ -151,21 +168,25 @@ export function ReviewPage() {
           <section className="panel summary-panel">
             <div className="review-summary-heading">
               <ClipboardList size={19} />
-              <h3>Resumo da avaliação</h3>
+
+              <h3>Resumo do material</h3>
             </div>
 
             <div className="review-summary-row">
-              <span>Questões</span>
+              <span>Questões adicionadas</span>
+
               <strong>{questions.length}</strong>
             </div>
 
             <div className="review-summary-row">
-              <span>Alternativas</span>
+              <span>Total de alternativas</span>
+
               <strong>{totalAlternatives}</strong>
             </div>
 
             <div className="review-summary-row">
-              <span>Origem</span>
+              <span>Forma de preparação</span>
+
               <strong>{generationOrigin}</strong>
             </div>
           </section>
@@ -173,17 +194,20 @@ export function ReviewPage() {
           <section className="review-guidance">
             <div className="review-guidance-heading">
               <ShieldCheck size={19} />
-              <h3>Conferência do conteúdo</h3>
+
+              <h3>Você decide como preparar</h3>
             </div>
 
             <p>
-              Todas as questões devem ser revisadas pelo
-              docente antes da exportação.
+              O material pode ser preparado com ou sem
+              questões. Você escolhe o que faz sentido
+              para sua atividade.
             </p>
 
             <p>
-              Verifique os enunciados, o gabarito e os feedbacks
-              para garantir a qualidade da avaliação.
+              Caso tenha incluído questões, confira os
+              enunciados, as alternativas e as respostas
+              antes de continuar.
             </p>
           </section>
         </aside>

@@ -1,3 +1,7 @@
+/* =========================================
+   ESTRUTURA DA PÁGINA
+========================================= */
+
 .generate-page {
   width: 100%;
   min-width: 0;
@@ -17,6 +21,10 @@
   line-height: 1.8;
 }
 
+/* =========================================
+   LAYOUT PRINCIPAL
+========================================= */
+
 .generate-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 310px;
@@ -30,6 +38,10 @@
   gap: 22px;
   min-width: 0;
 }
+
+/* =========================================
+   TÍTULOS DOS PAINÉIS
+========================================= */
 
 .generate-page .section-title {
   margin-bottom: 24px;
@@ -49,9 +61,14 @@
   height: 42px;
 }
 
+/* =========================================
+   ENVIO DE DOCUMENTOS
+========================================= */
+
 .generate-page .dropzone {
   min-height: 180px;
   gap: 10px;
+
   transition:
     border-color 0.15s ease,
     background 0.15s ease;
@@ -82,6 +99,10 @@
   border: 1px solid #d4e9dd;
 }
 
+/* =========================================
+   OPÇÕES DE CRIAÇÃO
+========================================= */
+
 .generate-page .mode-grid {
   gap: 12px;
 }
@@ -90,6 +111,7 @@
   min-height: 124px;
   padding: 17px 14px;
   gap: 9px;
+
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
@@ -108,6 +130,10 @@
 .generate-page .mode-card.selected span {
   color: #55777b;
 }
+
+/* =========================================
+   CONFIGURAÇÕES
+========================================= */
 
 .generate-page .options-fields {
   gap: 16px;
@@ -128,6 +154,10 @@
   margin-top: 22px;
 }
 
+/* =========================================
+   AÇÕES
+========================================= */
+
 .generate-actions {
   display: flex;
   align-items: center;
@@ -141,6 +171,7 @@
   align-items: center;
   gap: 10px;
   max-width: 310px;
+
   color: var(--color-text-secondary);
   font-size: 11px;
   line-height: 1.6;
@@ -157,6 +188,10 @@
   gap: 11px;
   white-space: nowrap;
 }
+
+/* =========================================
+   COLUNA LATERAL
+========================================= */
 
 .generate-aside {
   display: flex;
@@ -210,11 +245,14 @@
 .generate-guide-number {
   display: grid;
   place-items: center;
+
   width: 31px;
   height: 31px;
   flex-shrink: 0;
+
   background: var(--color-primary-light);
   border-radius: var(--radius-sm);
+
   color: var(--color-primary);
   font-size: 11px;
   font-weight: 700;
@@ -234,8 +272,13 @@
   line-height: 1.7;
 }
 
+/* =========================================
+   PAINEL INFORMATIVO
+========================================= */
+
 .generate-info {
   padding: 24px;
+
   background: #f0f6f5;
   border: 1px solid #dceae8;
   border-radius: var(--radius-lg);
@@ -264,6 +307,7 @@
   align-items: flex-start;
   gap: 10px;
   margin-top: 14px;
+
   color: #55737a;
   font-size: 11px;
   line-height: 1.7;
@@ -274,6 +318,72 @@
   margin-top: 2px;
   color: var(--color-success);
 }
+
+/* =========================================
+   AJUSTES DO TEMA ESCURO
+========================================= */
+
+/* Área de upload */
+
+[data-theme='dark'] .generate-page .dropzone:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+[data-theme='dark'] .generate-page .source-textarea::placeholder,
+[data-theme='dark'] .generate-page input::placeholder {
+  color: #91a5b4;
+}
+
+[data-theme='dark'] .generate-page .selected-file {
+  background: var(--color-success-background);
+  border-color: #345d50;
+  color: var(--color-success);
+}
+
+/* Opções de criação */
+
+[data-theme='dark'] .generate-page .mode-card:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+[data-theme='dark'] .generate-page .mode-card.selected {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+[data-theme='dark'] .generate-page .mode-card.selected span {
+  color: #a9d9d8;
+}
+
+/* Painel de orientações */
+
+[data-theme='dark'] .generate-info {
+  background: #20383d;
+  border-color: #345258;
+}
+
+[data-theme='dark'] .generate-info-heading {
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .generate-info-heading h2 {
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .generate-info > p,
+[data-theme='dark'] .generate-info-item {
+  color: var(--color-text-secondary);
+}
+
+[data-theme='dark'] .generate-info-divider {
+  background: var(--color-border);
+}
+
+/* =========================================
+   RESPONSIVIDADE — TELAS MÉDIAS
+========================================= */
 
 @media (max-width: 1200px) {
   .generate-layout {
@@ -286,6 +396,10 @@
     align-items: start;
   }
 }
+
+/* =========================================
+   RESPONSIVIDADE — CELULARES
+========================================= */
 
 @media (max-width: 730px) {
   .generate-page .panel {
@@ -335,6 +449,10 @@
     padding: 20px;
   }
 }
+
+/* =========================================
+   RESPONSIVIDADE — TELAS PEQUENAS
+========================================= */
 
 @media (max-width: 420px) {
   .generate-page .mode-grid {

@@ -5,7 +5,6 @@ import {
   FileText,
   Info,
   LoaderCircle,
-  Pencil,
   ShieldCheck,
   Sparkles
 } from 'lucide-react'
@@ -36,15 +35,15 @@ export function GeneratePage() {
       <header className="page-heading">
         <div className="eyebrow">
           <FileText size={15} />
-          PREPARAÇÃO DE AVALIAÇÕES
+          PREPARAÇÃO DO MATERIAL
         </div>
 
-        <h1>Criar questões para o Moodle</h1>
+        <h1>Prepare seu conteúdo para o Moodle</h1>
 
         <p>
-          Utilize seu material didático para elaborar questões de múltipla
-          escolha. Você pode criar questões manualmente ou utilizar
-          inteligência artificial como apoio.
+          Adicione seu texto ou documento para preparar o material
+          que será utilizado no Moodle. Se desejar, você também
+          poderá criar questões com ou sem ajuda da inteligência artificial.
         </p>
       </header>
 
@@ -61,7 +60,7 @@ export function GeneratePage() {
               <ShieldCheck size={18} />
 
               <span>
-                As questões poderão ser revisadas antes da exportação.
+                Você poderá revisar o conteúdo antes de finalizar.
               </span>
             </div>
 
@@ -74,18 +73,17 @@ export function GeneratePage() {
               {isGenerating ? (
                 <>
                   <LoaderCircle size={18} className="spin" />
-                  Gerando...
+                  Preparando...
                 </>
               ) : isManual ? (
                 <>
-                  <Pencil size={18} />
-                  Criar manualmente
+                  Continuar
                   <ArrowRight size={18} />
                 </>
               ) : (
                 <>
                   <Sparkles size={18} />
-                  Gerar sugestões
+                  Criar sugestões e continuar
                   <ArrowRight size={18} />
                 </>
               )}
@@ -106,10 +104,10 @@ export function GeneratePage() {
                 <span className="generate-guide-number">01</span>
 
                 <div>
-                  <h3>Prepare o conteúdo</h3>
+                  <h3>Adicione seu material</h3>
 
                   <p>
-                    Insira o texto-base ou envie um documento
+                    Digite ou cole seu texto, ou envie um documento
                     PDF, DOCX ou TXT.
                   </p>
                 </div>
@@ -119,11 +117,11 @@ export function GeneratePage() {
                 <span className="generate-guide-number">02</span>
 
                 <div>
-                  <h3>Escolha o método</h3>
+                  <h3>Escolha como continuar</h3>
 
                   <p>
-                    Crie questões manualmente ou utilize
-                    sugestões geradas por IA.
+                    Você pode preparar apenas o conteúdo ou,
+                    se preferir, incluir questões.
                   </p>
                 </div>
               </div>
@@ -132,11 +130,11 @@ export function GeneratePage() {
                 <span className="generate-guide-number">03</span>
 
                 <div>
-                  <h3>Revise as questões</h3>
+                  <h3>Revise seu material</h3>
 
                   <p>
-                    Confira os enunciados, as alternativas,
-                    os gabaritos e os feedbacks.
+                    Confira o conteúdo e faça os ajustes
+                    necessários antes de finalizar.
                   </p>
                 </div>
               </div>
@@ -148,8 +146,8 @@ export function GeneratePage() {
                   <h3>Exporte para o Moodle</h3>
 
                   <p>
-                    Gere o arquivo XML após finalizar
-                    a revisão das questões.
+                    Prepare o arquivo para utilizar seu
+                    material no ambiente virtual de aprendizagem.
                   </p>
                 </div>
               </div>
@@ -160,12 +158,13 @@ export function GeneratePage() {
             <div className="generate-info-heading">
               <Info size={19} />
 
-              <h2>Sobre a inteligência artificial</h2>
+              <h2>Você tem liberdade para escolher</h2>
             </div>
 
             <p>
-              O uso do Ollama é opcional. Você pode criar
-              e editar questões sem utilizar modelos de IA.
+              A criação de questões é opcional. Você pode
+              trabalhar com seu próprio conteúdo e utilizar
+              a inteligência artificial apenas quando desejar.
             </p>
 
             <div className="generate-info-divider" />
@@ -174,8 +173,8 @@ export function GeneratePage() {
               <CheckCircle2 size={16} />
 
               <span>
-                A conversão para Moodle XML é realizada
-                pelo backend, independentemente da IA.
+                Você não precisa utilizar inteligência
+                artificial para preparar seu material.
               </span>
             </div>
 
@@ -183,8 +182,8 @@ export function GeneratePage() {
               <CheckCircle2 size={16} />
 
               <span>
-                O professor mantém o controle sobre
-                o conteúdo final das questões.
+                Você mantém o controle sobre o conteúdo
+                e pode revisá-lo antes da exportação.
               </span>
             </div>
           </section>
