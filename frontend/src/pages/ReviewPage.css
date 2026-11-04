@@ -1,0 +1,249 @@
+.review-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.review-page .page-heading h1 {
+  font-size: clamp(28px, 3vw, 36px);
+}
+
+.review-page .page-heading p {
+  max-width: 740px;
+  line-height: 1.75;
+}
+
+.review-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 285px;
+  gap: 24px;
+  align-items: start;
+}
+
+.review-content {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+}
+
+.review-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 4px 0;
+}
+
+.review-toolbar-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 7px;
+}
+
+.review-toolbar h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.review-toolbar p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.review-page .counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 27px;
+  height: 25px;
+  padding: 0 8px;
+  background: var(--color-primary-light);
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.review-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.review-page .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 58px 30px;
+  text-align: center;
+}
+
+.review-page .empty-state > svg {
+  margin-bottom: 20px;
+  color: var(--color-primary);
+}
+
+.review-page .empty-state h2 {
+  margin-bottom: 10px;
+  color: var(--color-text);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.review-page .empty-state p {
+  max-width: 360px;
+  margin-bottom: 22px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.review-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0 16px;
+}
+
+.review-actions .button {
+  min-height: 45px;
+}
+
+.review-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.review-page .summary-panel {
+  padding: 25px;
+}
+
+.review-summary-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 21px;
+  color: var(--color-primary);
+}
+
+.review-summary-heading h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.review-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.review-summary-row:last-child {
+  border-bottom: 0;
+}
+
+.review-summary-row span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.review-summary-row strong {
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.review-guidance {
+  padding: 24px;
+  background: #f0f6f5;
+  border: 1px solid #dceae8;
+  border-radius: var(--radius-lg);
+}
+
+.review-guidance-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  color: var(--color-primary);
+}
+
+.review-guidance-heading h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.review-guidance p {
+  margin: 0 0 12px;
+  color: #55737a;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.review-guidance p:last-child {
+  margin-bottom: 0;
+}
+
+.review-page a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1160px) {
+  .review-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .review-aside {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+@media (max-width: 730px) {
+  .review-page .page-heading h1 {
+    font-size: 28px;
+  }
+
+  .review-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .review-toolbar > .button {
+    align-self: flex-start;
+  }
+
+  .review-aside {
+    grid-template-columns: 1fr;
+  }
+
+  .review-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .review-actions .button {
+    width: 100%;
+  }
+
+  .review-page .empty-state {
+    padding: 42px 20px;
+  }
+}

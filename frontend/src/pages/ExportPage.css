@@ -1,0 +1,391 @@
+.export-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.export-page .page-heading h1 {
+  margin-bottom: 12px;
+}
+
+.export-page .page-heading p {
+  line-height: 1.75;
+}
+
+.export-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.export-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.export-page .ready-panel {
+  padding: 30px;
+  text-align: left;
+}
+
+.export-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.export-page .ready-icon {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  flex-shrink: 0;
+  margin: 0;
+  background: #e8f5ee;
+  border-radius: 10px;
+  color: var(--color-success);
+}
+
+.export-page .ready-icon.not-ready {
+  background: #fff4e8;
+  color: #bc813e;
+}
+
+.export-status-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.export-page .ready-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 14px;
+  padding: 6px 10px;
+  background: #e8f5ee;
+  border-radius: var(--radius-sm);
+  color: var(--color-success);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.export-page .ready-pill.not-ready {
+  background: #fff4e8;
+  color: #aa7335;
+}
+
+.export-status-content h2 {
+  margin: 0 0 10px;
+  color: var(--color-text);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  line-height: 1.35;
+}
+
+.export-status-content p {
+  max-width: 520px;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.export-file-section {
+  padding-top: 28px;
+}
+
+.export-file-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.export-file-heading h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.export-file-heading span {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.export-page .download-file {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 0;
+  padding: 18px;
+  background: #f8fafb;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.export-page .xml-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  padding: 0;
+  background: var(--color-primary-light);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+}
+
+.download-file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.download-file-info strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.download-file-info small {
+  display: block;
+  margin-top: 6px;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.export-file-check {
+  flex-shrink: 0;
+  color: var(--color-success);
+}
+
+.export-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  margin-top: 22px;
+}
+
+.export-page .button {
+  min-height: 45px;
+}
+
+.export-page .button-download {
+  width: 100%;
+  min-height: 49px;
+}
+
+.export-actions > .button {
+  width: 100%;
+  margin: 0;
+}
+
+.export-information {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 21px;
+  background: #f0f6f5;
+  border: 1px solid #dceae8;
+  border-radius: var(--radius-lg);
+}
+
+.export-information > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-primary);
+}
+
+.export-information h3 {
+  margin: 0 0 7px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.export-information p {
+  margin: 0;
+  color: #55737a;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.export-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.export-page .import-panel {
+  padding: 26px;
+}
+
+.export-page .section-title {
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.export-page .icon-bubble {
+  width: 42px;
+  height: 42px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.export-page .section-title h2 {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.export-page .section-title p {
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.import-steps {
+  display: flex;
+  flex-direction: column;
+}
+
+.export-page .import-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.export-page .import-step:first-child {
+  padding-top: 0;
+}
+
+.export-page .import-step:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.export-page .import-step span {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  background: var(--color-primary-light);
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.export-page .import-step p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.export-page .import-step strong {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.export-new-evaluation {
+  padding: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.export-new-evaluation h3 {
+  margin: 0 0 9px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.export-new-evaluation p {
+  margin: 0 0 19px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.export-new-evaluation .button {
+  width: 100%;
+  margin: 0;
+}
+
+.export-page a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1160px) {
+  .export-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .export-aside {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+@media (max-width: 730px) {
+  .export-page .ready-panel {
+    padding: 22px;
+  }
+
+  .export-status {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .export-status-content h2 {
+    font-size: 20px;
+  }
+
+  .export-file-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .export-aside {
+    grid-template-columns: 1fr;
+  }
+
+  .export-page .import-panel {
+    padding: 22px;
+  }
+
+  .export-new-evaluation {
+    padding: 22px;
+  }
+}
+
+@media (max-width: 420px) {
+  .export-page .download-file {
+    gap: 10px;
+    padding: 13px;
+  }
+
+  .export-page .xml-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .download-file-info strong {
+    font-size: 12px;
+  }
+}
