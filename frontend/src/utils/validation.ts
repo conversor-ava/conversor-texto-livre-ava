@@ -1,5 +1,8 @@
 import type { Question } from '../types/question'
 
+const MAX_FILE_SIZE_MB = 25
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+
 export function validateQuestions(
   questions: Question[]
 ): string | null {
@@ -11,7 +14,7 @@ export function validateQuestions(
     const label = `Questão ${index + 1}`
 
     if (!question.name.trim() || question.name.length > 255) {
-      return `${label}: nome obrigatório (até 255 caracteres).`
+      return `${label}: informe um nome com até 255 caracteres.`
     }
 
     if (!question.text.trim()) {
@@ -19,14 +22,14 @@ export function validateQuestions(
     }
 
     if ((question.category?.length ?? 0) > 255) {
-      return `${label}: categoria deve ter até 255 caracteres.`
+      return `${label}: a categoria deve ter até 255 caracteres.`
     }
 
     if (
       question.answers.length < 2 ||
       question.answers.length > 8
     ) {
-      return `${label}: use de 2 a 8 alternativas.`
+      return `${label}: escolha entre 2 e 8 alternativas.`
     }
 
     const correctAnswers = question.answers.filter(
@@ -34,7 +37,7 @@ export function validateQuestions(
     )
 
     if (correctAnswers.length !== 1) {
-      return `${label}: marque exatamente uma resposta correta.`
+      return `${label}: selecione uma única resposta correta.`
     }
 
     const unique = new Set<string>()
@@ -45,11 +48,11 @@ export function validateQuestions(
         .toLocaleLowerCase('pt-BR')
 
       if (!text || !answer.feedback.trim()) {
-        return `${label}: texto e feedback são obrigatórios em todas as alternativas.`
+        return `${label}: preencha o texto e o comentário de cada alternativa.`
       }
 
       if (unique.has(text)) {
-        return `${label}: existem alternativas duplicadas.`
+        return `${label}: há alternativas com o mesmo texto. Revise as respostas.`
       }
 
       unique.add(text)
@@ -71,11 +74,11 @@ export function validateDocument(
     !extension ||
     !['pdf', 'docx', 'txt'].includes(extension)
   ) {
-    return 'Utilize um arquivo PDF, DOCX ou TXT.'
+    return 'Escolha um documento nos formatos PDF, DOCX ou TXT.'
   }
 
-  if (file.size > 5 * 1024 * 1024) {
-    return 'O tamanho máximo do arquivo é 5 MB.'
+  if (file.size > MAX_FILE_SIZE_BYTES) {
+    return `O arquivo ultrapassa o limite de ${MAX_FILE_SIZE_MB} MB. Escolha um documento menor para continuar.`
   }
 
   return null

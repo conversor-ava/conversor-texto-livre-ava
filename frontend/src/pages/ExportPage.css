@@ -1,3 +1,7 @@
+/* =========================================
+   ESTRUTURA DA PÁGINA
+========================================= */
+
 .export-page {
   width: 100%;
   min-width: 0;
@@ -10,6 +14,10 @@
 .export-page .page-heading p {
   line-height: 1.75;
 }
+
+/* =========================================
+   LAYOUT PRINCIPAL
+========================================= */
 
 .export-layout {
   display: grid;
@@ -25,6 +33,10 @@
   min-width: 0;
 }
 
+/* =========================================
+   PAINEL DE EXPORTAÇÃO
+========================================= */
+
 .export-page .ready-panel {
   padding: 30px;
   text-align: left;
@@ -38,13 +50,20 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+/* =========================================
+   INDICADORES DE STATUS
+========================================= */
+
 .export-page .ready-icon {
   display: grid;
   place-items: center;
+
   width: 62px;
   height: 62px;
   flex-shrink: 0;
+
   margin: 0;
+
   background: #e8f5ee;
   border-radius: 10px;
   color: var(--color-success);
@@ -64,10 +83,13 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
+
   margin-bottom: 14px;
   padding: 6px 10px;
+
   background: #e8f5ee;
   border-radius: var(--radius-sm);
+
   color: var(--color-success);
   font-size: 11px;
   font-weight: 700;
@@ -80,6 +102,7 @@
 
 .export-status-content h2 {
   margin: 0 0 10px;
+
   color: var(--color-text);
   font-size: 22px;
   font-weight: 800;
@@ -89,11 +112,17 @@
 
 .export-status-content p {
   max-width: 520px;
+
   margin: 0;
+
   color: var(--color-text-secondary);
   font-size: 12px;
   line-height: 1.8;
 }
+
+/* =========================================
+   SEÇÃO DO ARQUIVO XML
+========================================= */
 
 .export-file-section {
   padding-top: 28px;
@@ -104,11 +133,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 15px;
+
   margin-bottom: 15px;
 }
 
 .export-file-heading h3 {
   margin: 0;
+
   color: var(--color-text);
   font-size: 13px;
   font-weight: 700;
@@ -119,12 +150,18 @@
   font-size: 11px;
 }
 
+/* =========================================
+   CARTÃO DO ARQUIVO
+========================================= */
+
 .export-page .download-file {
   display: flex;
   align-items: center;
   gap: 15px;
+
   margin: 0;
   padding: 18px;
+
   background: #f8fafb;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -133,10 +170,13 @@
 .export-page .xml-icon {
   display: grid;
   place-items: center;
+
   width: 46px;
   height: 46px;
   flex-shrink: 0;
+
   padding: 0;
+
   background: var(--color-primary-light);
   border-radius: var(--radius-md);
   color: var(--color-primary);
@@ -150,6 +190,7 @@
 .download-file-info strong {
   display: block;
   overflow-wrap: anywhere;
+
   color: var(--color-text);
   font-size: 13px;
   font-weight: 700;
@@ -158,6 +199,7 @@
 .download-file-info small {
   display: block;
   margin-top: 6px;
+
   color: var(--color-text-secondary);
   font-size: 11px;
 }
@@ -166,6 +208,10 @@
   flex-shrink: 0;
   color: var(--color-success);
 }
+
+/* =========================================
+   AÇÕES DE EXPORTAÇÃO
+========================================= */
 
 .export-actions {
   display: flex;
@@ -188,11 +234,17 @@
   margin: 0;
 }
 
+/* =========================================
+   PAINEL INFORMATIVO
+========================================= */
+
 .export-information {
   display: flex;
   align-items: flex-start;
   gap: 14px;
+
   padding: 21px;
+
   background: #f0f6f5;
   border: 1px solid #dceae8;
   border-radius: var(--radius-lg);
@@ -206,6 +258,7 @@
 
 .export-information h3 {
   margin: 0 0 7px;
+
   color: var(--color-text);
   font-size: 13px;
   font-weight: 700;
@@ -213,10 +266,15 @@
 
 .export-information p {
   margin: 0;
+
   color: #55737a;
   font-size: 12px;
   line-height: 1.75;
 }
+
+/* =========================================
+   COLUNA LATERAL
+========================================= */
 
 .export-aside {
   display: flex;
@@ -224,6 +282,10 @@
   gap: 20px;
   min-width: 0;
 }
+
+/* =========================================
+   ORIENTAÇÕES DO MOODLE
+========================================= */
 
 .export-page .import-panel {
   padding: 26px;
@@ -237,6 +299,7 @@
 .export-page .icon-bubble {
   width: 42px;
   height: 42px;
+
   background: var(--color-primary-light);
   color: var(--color-primary);
 }
@@ -260,7 +323,9 @@
   display: flex;
   align-items: flex-start;
   gap: 13px;
+
   padding: 17px 0;
+
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -276,11 +341,15 @@
 .export-page .import-step span {
   display: grid;
   place-items: center;
+
   min-width: 32px;
   height: 32px;
+
   padding: 0;
+
   background: var(--color-primary-light);
   border-radius: var(--radius-sm);
+
   color: var(--color-primary);
   font-size: 11px;
   font-weight: 700;
@@ -288,6 +357,7 @@
 
 .export-page .import-step p {
   margin: 0;
+
   color: var(--color-text-secondary);
   font-size: 12px;
   line-height: 1.75;
@@ -298,8 +368,14 @@
   font-weight: 700;
 }
 
+/* =========================================
+   NOVO MATERIAL
+   Mantido para compatibilidade
+========================================= */
+
 .export-new-evaluation {
   padding: 24px;
+
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -307,6 +383,7 @@
 
 .export-new-evaluation h3 {
   margin: 0 0 9px;
+
   color: var(--color-text);
   font-size: 14px;
   font-weight: 700;
@@ -314,6 +391,7 @@
 
 .export-new-evaluation p {
   margin: 0 0 19px;
+
   color: var(--color-text-secondary);
   font-size: 12px;
   line-height: 1.75;
@@ -324,10 +402,108 @@
   margin: 0;
 }
 
+/* =========================================
+   ACESSIBILIDADE
+========================================= */
+
 .export-page a:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
+
+/* =========================================
+   AJUSTES EXCLUSIVOS DO TEMA ESCURO
+========================================= */
+
+/* Indicador de material pronto */
+
+[data-theme='dark'] .export-page .ready-icon:not(.not-ready) {
+  background: #1c3c34;
+  color: var(--color-success);
+}
+
+[data-theme='dark'] .export-page .ready-pill:not(.not-ready) {
+  background: #1c3c34;
+  color: var(--color-success);
+}
+
+/* Indicador de material não pronto */
+
+[data-theme='dark'] .export-page .ready-icon.not-ready {
+  background: #463725;
+  color: #f2bd78;
+}
+
+[data-theme='dark'] .export-page .ready-pill.not-ready {
+  background: #463725;
+  color: #f2bd78;
+}
+
+/* Arquivo XML */
+
+[data-theme='dark'] .export-page .download-file {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+}
+
+[data-theme='dark'] .export-page .xml-icon {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .download-file-info strong {
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .download-file-info small {
+  color: var(--color-text-secondary);
+}
+
+[data-theme='dark'] .export-file-check {
+  color: var(--color-success);
+}
+
+/* Painel informativo */
+
+[data-theme='dark'] .export-information {
+  background: #20383d;
+  border-color: #345258;
+}
+
+[data-theme='dark'] .export-information > svg {
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .export-information h3 {
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .export-information p {
+  color: var(--color-text-secondary);
+}
+
+/* Orientações de importação */
+
+[data-theme='dark'] .export-page .import-step {
+  border-bottom-color: var(--color-border);
+}
+
+[data-theme='dark'] .export-page .import-step span {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .export-page .import-step p {
+  color: var(--color-text-secondary);
+}
+
+[data-theme='dark'] .export-page .import-step strong {
+  color: var(--color-text);
+}
+
+/* =========================================
+   RESPONSIVIDADE — TELAS MÉDIAS
+========================================= */
 
 @media (max-width: 1160px) {
   .export-layout {
@@ -340,6 +516,10 @@
     align-items: start;
   }
 }
+
+/* =========================================
+   RESPONSIVIDADE — CELULARES
+========================================= */
 
 @media (max-width: 730px) {
   .export-page .ready-panel {
@@ -373,6 +553,10 @@
     padding: 22px;
   }
 }
+
+/* =========================================
+   RESPONSIVIDADE — TELAS PEQUENAS
+========================================= */
 
 @media (max-width: 420px) {
   .export-page .download-file {

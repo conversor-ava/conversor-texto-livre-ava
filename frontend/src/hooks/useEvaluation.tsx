@@ -13,7 +13,6 @@ import {
   suggestQuestions
 } from '../services/api'
 import {
-  emptyQuestion,
   type BusyAction,
   type GenerationConfig,
   type Question
@@ -179,7 +178,7 @@ export function EvaluationProvider({
 
       notify(
         'success',
-        `${result.filename}: ${result.characters} caracteres extraídos.`
+        `O conteúdo de "${result.filename}" foi carregado com sucesso.`
       )
     } catch (cause) {
       if (revision !== revisionRef.current) {
@@ -190,7 +189,7 @@ export function EvaluationProvider({
         'error',
         cause instanceof Error
           ? cause.message
-          : 'Erro na extração do arquivo.'
+          : 'Não conseguimos ler seu documento. Tente novamente.'
       )
     } finally {
       finishOperation(revision)
@@ -202,20 +201,16 @@ export function EvaluationProvider({
       return false
     }
 
+    // A criação de questões é opcional.
+    // No modo manual, o professor pode continuar sem gerar questões.
     if (config.mode === 'manual') {
-      if (questions.length === 0) {
-        setQuestions([
-          emptyQuestion(1, config.alternatives)
-        ])
-      }
-
       return true
     }
 
     if (!config.text.trim()) {
       notify(
         'error',
-        'Informe um texto-base antes de gerar sugestões.'
+        'Adicione um texto ou documento para receber sugestões de questões.'
       )
       return false
     }
@@ -223,7 +218,7 @@ export function EvaluationProvider({
     if (config.mode === 'rag' && !config.topic.trim()) {
       notify(
         'error',
-        'Informe o tema para a busca semântica.'
+        'Informe o assunto que deseja explorar no seu material.'
       )
       return false
     }
@@ -250,8 +245,8 @@ export function EvaluationProvider({
 
       if (!result.questions.length) {
         notify(
-          'error',
-          'A IA não retornou questões. Tente novamente.'
+          'info',
+          'Não encontramos sugestões de questões desta vez. Você pode tentar novamente ou continuar sem utilizar inteligência artificial.'
         )
         return false
       }
@@ -266,7 +261,11 @@ export function EvaluationProvider({
 
       notify(
         'success',
-        `${result.questions.length} questões sugeridas. Revise todas antes de exportar.`
+        `${result.questions.length} ${
+          result.questions.length === 1
+            ? 'questão sugerida'
+            : 'questões sugeridas'
+        }. Você poderá revisar e editar o conteúdo antes de finalizar.`
       )
 
       return true
@@ -279,7 +278,7 @@ export function EvaluationProvider({
         'error',
         cause instanceof Error
           ? cause.message
-          : 'Erro ao gerar sugestões.'
+          : 'Não conseguimos preparar as sugestões. Tente novamente.'
       )
 
       return false
@@ -293,6 +292,8 @@ export function EvaluationProvider({
       return false
     }
 
+    // A exportação atual continua utilizando questões estruturadas.
+    // A conversão de textos sem questões será implementada no backend.
     const error = validateQuestions(questions)
 
     if (error) {
@@ -317,7 +318,7 @@ export function EvaluationProvider({
 
       notify(
         'success',
-        'Arquivo Moodle XML baixado com sucesso.'
+        'Seu arquivo para o Moodle foi baixado com sucesso.'
       )
 
       return true
@@ -330,7 +331,7 @@ export function EvaluationProvider({
         'error',
         cause instanceof Error
           ? cause.message
-          : 'Erro ao exportar o XML.'
+          : 'Não conseguimos preparar o arquivo. Tente novamente.'
       )
 
       return false

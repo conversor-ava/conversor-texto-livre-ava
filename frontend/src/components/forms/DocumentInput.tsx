@@ -48,10 +48,11 @@ export function DocumentInput() {
         </div>
 
         <div>
-          <h2>Material de referência</h2>
+          <h2>Seu material didático</h2>
 
           <p>
-            Cole um texto ou extraia conteúdo de um documento.
+            Adicione o conteúdo que deseja preparar para o Moodle.
+            Você pode escrever, colar um texto ou enviar um documento.
           </p>
         </div>
       </div>
@@ -80,12 +81,12 @@ export function DocumentInput() {
 
         <strong>
           {busy === 'extract'
-            ? 'Extraindo texto...'
-            : 'Arraste um arquivo aqui ou selecione'}
+            ? 'Preparando seu documento...'
+            : 'Arraste seu documento aqui ou selecione um arquivo'}
         </strong>
 
         <span>
-          PDF, DOCX ou TXT · Até 5 MB
+          PDF, DOCX ou TXT · Até 25 MB
         </span>
 
         <button
@@ -106,7 +107,7 @@ export function DocumentInput() {
 
           <button
             type="button"
-            aria-label="Limpar arquivo"
+            aria-label="Remover documento"
             onClick={() =>
               updateConfig({
                 filename: null,
@@ -120,14 +121,14 @@ export function DocumentInput() {
       )}
 
       <div className="input-separator">
-        <span>OU COLE O CONTEÚDO</span>
+        <span>OU ADICIONE SEU TEXTO</span>
       </div>
 
       <label
         htmlFor="source-text"
         className="field-label"
       >
-        Texto-base
+        Conteúdo do material
       </label>
 
       <textarea
@@ -140,7 +141,7 @@ export function DocumentInput() {
             filename: null
           })
         }
-        placeholder="Cole aqui o material didático que será utilizado para criar questões..."
+        placeholder="Digite ou cole aqui seu material didático. Você poderá preparar o conteúdo para o Moodle e, se desejar, incluir questões."
         rows={8}
       />
 

@@ -1,8 +1,27 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react'
+import {
+  MemoryRouter,
+  Route,
+  Routes
+} from 'react-router-dom'
+import {
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi
+} from 'vitest'
+
 import { Toast } from '../../components/ui/Toast'
-import { EvaluationProvider, useEvaluation } from '../../hooks/useEvaluation'
+import {
+  EvaluationProvider,
+  useEvaluation
+} from '../../hooks/useEvaluation'
 import { GeneratePage } from '../../pages/GeneratePage'
 import { suggestQuestions } from '../../services/api'
 import { emptyQuestion } from '../../types/question'
@@ -14,7 +33,9 @@ vi.mock('../../services/api', () => ({
   health: vi.fn()
 }))
 
-beforeEach(() => vi.clearAllMocks())
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 function TestNotice() {
   const { notice, dismiss } = useEvaluation()
@@ -31,15 +52,32 @@ function TestNotice() {
   )
 }
 
+function ReviewFixture() {
+  const { questions } = useEvaluation()
+
+  return (
+    <div>
+      <h1>REVISÃO ABERTA</h1>
+      <span data-testid="total-questions">
+        {questions.length}
+      </span>
+    </div>
+  )
+}
+
 function setup() {
-  render(
+  return render(
     <MemoryRouter initialEntries={['/']}>
       <EvaluationProvider>
         <Routes>
-          <Route path="/" element={<GeneratePage />} />
+          <Route
+            path="/"
+            element={<GeneratePage />}
+          />
+
           <Route
             path="/revisao"
-            element={<div>REVISÃO ABERTA</div>}
+            element={<ReviewFixture />}
           />
         </Routes>
 
@@ -49,15 +87,36 @@ function setup() {
   )
 }
 
-describe('página de geração', () => {
+function selectSimpleMode() {
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: /Receber sugestões/i
+    })
+  )
+}
+
+function selectRagMode() {
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: /Sugestões direcionadas/i
+    })
+  )
+}
+
+function continuePreparation() {
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: /Gerar sugestões|Continuar/i
+    })
+  )
+}
+
+describe('página de preparação do material', () => {
   it('segue para revisão sem chamar IA no modo manual', async () => {
     setup()
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: /Criar manualmente/i
-      })
-    )
+    // O modo manual já é selecionado por padrão.
+    continuePreparation()
 
     expect(
       await screen.findByText('REVISÃO ABERTA')
@@ -66,25 +125,33 @@ describe('página de geração', () => {
     expect(suggestQuestions).not.toHaveBeenCalled()
   })
 
-  it('não tenta gerar sugestões sem texto-base', async () => {
+  it('não cria questões automaticamente no modo manual', async () => {
     setup()
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: /IA simples/i
-      })
-    )
+    continuePreparation()
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: /Gerar sugestões/i
-      })
-    )
+    expect(
+      await screen.findByText('REVISÃO ABERTA')
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByTestId('total-questions')
+    ).toHaveTextContent('0')
+
+    expect(suggestQuestions).not.toHaveBeenCalled()
+  })
+
+  it('não tenta gerar sugestões sem conteúdo', async () => {
+    setup()
+
+    selectSimpleMode()
+
+    continuePreparation()
 
     expect(
       await screen.findByRole('alert')
     ).toHaveTextContent(
-      'Informe um texto-base antes de gerar sugestões.'
+      'Adicione um texto ou documento para receber sugestões de questões.'
     )
 
     expect(suggestQuestions).not.toHaveBeenCalled()
@@ -106,7 +173,7 @@ describe('página de geração', () => {
     setup()
 
     fireEvent.change(
-      screen.getByLabelText('Texto-base'),
+      screen.getByLabelText('Conteúdo do material'),
       {
         target: {
           value: 'A fotossíntese permite a produção de glicose.'
@@ -114,17 +181,9 @@ describe('página de geração', () => {
       }
     )
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: /IA simples/i
-      })
-    )
+    selectSimpleMode()
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: /Gerar sugestões/i
-      })
-    )
+    continuePreparation()
 
     await waitFor(() => {
       expect(suggestQuestions).toHaveBeenCalledWith(
@@ -138,6 +197,10 @@ describe('página de geração', () => {
     expect(
       await screen.findByText('REVISÃO ABERTA')
     ).toBeInTheDocument()
+
+    expect(
+      screen.getByTestId('total-questions')
+    ).toHaveTextContent('1')
   })
 
   it('não avança quando a IA retorna uma lista vazia', async () => {
@@ -148,7 +211,7 @@ describe('página de geração', () => {
     setup()
 
     fireEvent.change(
-      screen.getByLabelText('Texto-base'),
+      screen.getByLabelText('Conteúdo do material'),
       {
         target: {
           value: 'Conteúdo de exemplo'
@@ -156,17 +219,9 @@ describe('página de geração', () => {
       }
     )
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: /IA simples/i
-      })
-    )
+    selectSimpleMode()
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: /Gerar sugestões/i
-      })
-    )
+    continuePreparation()
 
     await waitFor(() => {
       expect(suggestQuestions).toHaveBeenCalledTimes(1)
@@ -175,7 +230,7 @@ describe('página de geração', () => {
     expect(
       await screen.findByRole('alert')
     ).toHaveTextContent(
-      'A IA não retornou questões. Tente novamente.'
+      'Não encontramos sugestões de questões desta vez.'
     )
 
     expect(
@@ -183,11 +238,11 @@ describe('página de geração', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('exige tema para IA com RAG', async () => {
+  it('exige assunto para sugestões direcionadas', async () => {
     setup()
 
     fireEvent.change(
-      screen.getByLabelText('Texto-base'),
+      screen.getByLabelText('Conteúdo do material'),
       {
         target: {
           value: 'Conteúdo'
@@ -195,22 +250,14 @@ describe('página de geração', () => {
       }
     )
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: /IA \+ RAG/i
-      })
-    )
+    selectRagMode()
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: /Gerar sugestões/i
-      })
-    )
+    continuePreparation()
 
     expect(
       await screen.findByRole('alert')
     ).toHaveTextContent(
-      'Informe o tema para a busca semântica.'
+      'Informe o assunto que deseja explorar no seu material.'
     )
 
     expect(suggestQuestions).not.toHaveBeenCalled()

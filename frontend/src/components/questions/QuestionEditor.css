@@ -1,24 +1,37 @@
+/* =========================================
+   ESTRUTURA DO EDITOR
+========================================= */
+
 .question-editor {
   padding: 28px;
 }
+
+/* =========================================
+   CABEÇALHO DA QUESTÃO
+========================================= */
 
 .question-editor .editor-header {
   display: flex;
   align-items: center;
   gap: 14px;
+
   padding-bottom: 22px;
   margin-bottom: 24px;
+
   border-bottom: 1px solid var(--color-border);
 }
 
 .question-editor .question-badge {
   display: grid;
   place-items: center;
+
   width: 40px;
   height: 40px;
   flex-shrink: 0;
+
   background: var(--color-primary-light);
   border-radius: var(--radius-md);
+
   color: var(--color-primary);
   font-size: 12px;
   font-weight: 800;
@@ -31,6 +44,7 @@
 
 .question-editor .editor-header h3 {
   margin: 0 0 5px;
+
   color: var(--color-text);
   font-size: 15px;
   font-weight: 700;
@@ -38,19 +52,27 @@
 
 .question-editor .editor-header p {
   margin: 0;
+
   color: var(--color-text-secondary);
   font-size: 11px;
   line-height: 1.6;
 }
 
+/* =========================================
+   BOTÕES DE AÇÃO
+========================================= */
+
 .question-editor .icon-button {
   display: grid;
   place-items: center;
   flex-shrink: 0;
+
   padding: 8px;
+
   background: transparent;
   border: 0;
   border-radius: var(--radius-sm);
+
   color: #8593a2;
 }
 
@@ -63,6 +85,10 @@
   background: #fff0f0;
   color: var(--color-error);
 }
+
+/* =========================================
+   CAMPOS DA QUESTÃO
+========================================= */
 
 .question-editor .editor-grid {
   display: grid;
@@ -95,16 +121,22 @@
   margin-top: 20px;
 }
 
+/* =========================================
+   TÍTULO DAS ALTERNATIVAS
+========================================= */
+
 .question-editor .answers-label {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+
   margin: 27px 0 16px;
 }
 
 .question-editor .answers-label h4 {
   margin: 0;
+
   color: var(--color-text);
   font-size: 13px;
   font-weight: 700;
@@ -114,6 +146,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+
   color: var(--color-text-secondary);
   font-size: 11px;
 }
@@ -121,6 +154,10 @@
 .question-editor .answers-label svg {
   color: var(--color-success);
 }
+
+/* =========================================
+   LISTA DE ALTERNATIVAS
+========================================= */
 
 .question-editor .answer-items {
   display: flex;
@@ -130,13 +167,17 @@
 
 .question-editor .answer-item {
   padding: 14px;
+
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+
   transition:
     background 0.15s ease,
     border-color 0.15s ease;
 }
+
+/* Alternativa correta */
 
 .question-editor .answer-item.correct {
   background: #f2faf6;
@@ -150,16 +191,24 @@
   min-width: 0;
 }
 
+/* =========================================
+   SELEÇÃO DA RESPOSTA CORRETA
+========================================= */
+
 .question-editor .radio-button {
   display: grid;
   place-items: center;
+
   width: 23px;
   height: 23px;
   flex-shrink: 0;
+
   padding: 0;
+
   background: var(--color-surface);
   border: 1.5px solid var(--color-border-strong);
   border-radius: 50%;
+
   color: #ffffff;
 }
 
@@ -170,29 +219,42 @@
 
 .question-editor .answer-letter {
   min-width: 15px;
+
   color: var(--color-text-secondary);
   font-size: 12px;
   font-weight: 800;
 }
 
+/* =========================================
+   CAMPOS DAS ALTERNATIVAS
+========================================= */
+
 .question-editor .answer-main input {
   flex: 1;
   min-width: 0;
   min-height: 42px;
+
   padding: 10px 12px;
+
   font-size: 12px;
 }
+
+/* =========================================
+   COMENTÁRIO DA ALTERNATIVA
+========================================= */
 
 .question-editor .answer-feedback {
   display: flex;
   align-items: center;
   gap: 11px;
+
   margin: 12px 0 0 34px;
   min-width: 0;
 }
 
 .question-editor .answer-feedback span {
   min-width: 58px;
+
   color: var(--color-text-secondary);
   font-size: 11px;
   font-weight: 700;
@@ -202,21 +264,31 @@
   flex: 1;
   min-width: 0;
   min-height: 39px;
+
   padding: 10px 12px;
+
   font-size: 11px;
 }
+
+/* =========================================
+   BOTÃO ADICIONAR ALTERNATIVA
+========================================= */
 
 .question-editor .button-dashed {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 9px;
+
   width: 100%;
   min-height: 43px;
+
   margin-top: 14px;
+
   background: #f7faf9;
   border: 1.5px dashed #b9d5d1;
   border-radius: var(--radius-md);
+
   color: var(--color-primary);
   font-size: 12px;
   font-weight: 700;
@@ -231,10 +303,107 @@
   margin-top: 23px;
 }
 
+/* =========================================
+   ACESSIBILIDADE
+========================================= */
+
 .question-editor button:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
+
+/* =========================================
+   AJUSTES EXCLUSIVOS DO TEMA ESCURO
+========================================= */
+
+/* Botões do cabeçalho */
+
+[data-theme='dark'] .question-editor .icon-button {
+  color: var(--color-text-secondary);
+}
+
+[data-theme='dark'] .question-editor .icon-button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .question-editor .icon-button.danger:hover {
+  background: #462b32;
+  color: var(--color-error);
+}
+
+/* Campos */
+
+[data-theme='dark'] .question-editor .control-row input,
+[data-theme='dark'] .question-editor .control-row textarea {
+  background: var(--color-surface);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .question-editor .control-row input::placeholder,
+[data-theme='dark'] .question-editor .control-row textarea::placeholder {
+  color: #91a5b4;
+}
+
+/* Alternativas */
+
+[data-theme='dark'] .question-editor .answer-item {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+/* Destaque da alternativa correta */
+
+[data-theme='dark'] .question-editor .answer-item.correct {
+  background: #1b3833;
+  border-color: #3c806b;
+}
+
+/* Botão de seleção */
+
+[data-theme='dark'] .question-editor .radio-button {
+  background: var(--color-surface);
+  border-color: var(--color-border-strong);
+}
+
+[data-theme='dark'] .question-editor .radio-button.checked {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: #102229;
+}
+
+/* Letras A, B, C... */
+
+[data-theme='dark'] .question-editor .answer-letter {
+  color: var(--color-text-secondary);
+}
+
+/* Campos de resposta e comentário */
+
+[data-theme='dark'] .question-editor .answer-main input,
+[data-theme='dark'] .question-editor .answer-feedback input {
+  background: #22333e;
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+/* Botão de adicionar alternativa */
+
+[data-theme='dark'] .question-editor .button-dashed {
+  background: #20333b;
+  border-color: #426c6c;
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .question-editor .button-dashed:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+/* =========================================
+   RESPONSIVIDADE — CELULARES
+========================================= */
 
 @media (max-width: 730px) {
   .question-editor {
@@ -270,6 +439,10 @@
     min-width: 51px;
   }
 }
+
+/* =========================================
+   RESPONSIVIDADE — TELAS PEQUENAS
+========================================= */
 
 @media (max-width: 420px) {
   .question-editor .answer-feedback {

@@ -42,14 +42,32 @@ async function apiError(response: Response): Promise<never> {
         return entry.msg
       }
 
-      return 'Campo inválido'
+      return 'Algumas informações precisam ser corrigidas.'
     })
 
     throw new Error(messages.join('; '))
   }
 
+  if (response.status === 413) {
+    throw new Error(
+      'O documento é maior do que o tamanho permitido pelo serviço.'
+    )
+  }
+
+  if (response.status === 429) {
+    throw new Error(
+      'Muitas solicitações foram realizadas. Aguarde um momento e tente novamente.'
+    )
+  }
+
+  if (response.status >= 500) {
+    throw new Error(
+      'Não conseguimos concluir sua solicitação neste momento. Tente novamente em instantes.'
+    )
+  }
+
   throw new Error(
-    `A operação falhou (HTTP ${response.status}).`
+    'Não foi possível concluir a operação. Confira as informações e tente novamente.'
   )
 }
 
@@ -78,13 +96,13 @@ async function request(
   } catch (error) {
     if (controller.signal.aborted) {
       throw new Error(
-        'A requisição demorou demais para responder. Tente novamente.'
+        'A solicitação está demorando mais que o esperado. Tente novamente em alguns instantes.'
       )
     }
 
     if (error instanceof TypeError) {
       throw new Error(
-        'Não foi possível conectar ao backend FastAPI.'
+        'Não conseguimos acessar o serviço neste momento. Verifique sua conexão e tente novamente.'
       )
     }
 
@@ -99,7 +117,7 @@ async function readJson<T>(response: Response): Promise<T> {
     return await response.json() as T
   } catch {
     throw new Error(
-      'O backend retornou uma resposta JSON inválida.'
+      'Não foi possível interpretar as informações recebidas. Tente novamente.'
     )
   }
 }
@@ -185,7 +203,7 @@ export async function exportMoodleXml(
 
   if (blob.size === 0) {
     throw new Error(
-      'O backend retornou um arquivo XML vazio.'
+      'O arquivo gerado está vazio. Tente realizar a exportação novamente.'
     )
   }
 
