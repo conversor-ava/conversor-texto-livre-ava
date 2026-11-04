@@ -28,7 +28,7 @@ MANIFEST
 
 # PyInstaller
 #   Usually these files are written by a python script from a template
-#   before PyInstaller builds the exe, so as to inject date/other infos into it.
+#   before PyInstaller builds the exe into a Windows executable.
 *.manifest
 *.spec
 
@@ -228,3 +228,26 @@ output/
 !.vscode/settings.json
 .DS_Store
 Thumbs.db
+
+# Frontend tests and coverage
+coverage/
+playwright-report/
+test-results/
+
+# Node / TypeScript cache
+.npm/
+.pnpm-store/
+*.tsbuildinfo
+yarn-debug.log*
+
+# Private keys and certificates
+*.pem
+*.p12
+*.pfx
+*.key
+id_rsa
+id_ed25519
+
+# Credentials
+credentials.json
+service-account*.json

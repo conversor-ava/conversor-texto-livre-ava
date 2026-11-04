@@ -1,0 +1,281 @@
+#root {
+  min-height: 100vh;
+  min-width: 320px;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+input,
+textarea,
+select {
+  max-width: 100%;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+.app-shell .sidebar {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5dd transparent;
+}
+
+.app-shell .sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.app-shell .sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5dd;
+  border-radius: 6px;
+}
+
+.app-shell .topbar-left {
+  min-width: 0;
+}
+
+.app-shell .topbar-left strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell .main-footer {
+  flex-wrap: wrap;
+}
+
+.generate-page .section-title > div:last-child,
+.export-page .section-title > div:last-child {
+  min-width: 0;
+}
+
+.question-editor .editor-header > div {
+  min-width: 0;
+}
+
+.question-editor .answer-main input,
+.question-editor .answer-feedback input {
+  width: 100%;
+  min-width: 0;
+}
+
+.review-page .review-toolbar-title {
+  flex-wrap: wrap;
+}
+
+.export-page .download-file-info {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .generate-page .mode-card strong,
+  .generate-page .mode-card span {
+    overflow-wrap: anywhere;
+  }
+
+  .question-editor .editor-header h3 {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 730px) {
+  .app-shell .sidebar {
+    max-width: 85vw;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .app-shell .topbar {
+    gap: 10px;
+  }
+
+  .app-shell .topbar-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .app-shell .topbar-badge {
+    flex-shrink: 0;
+  }
+
+  .app-shell .step-indicator {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .app-shell .step-item {
+    min-width: 0;
+  }
+
+  .generate-page .dropzone {
+    padding: 20px 12px;
+  }
+
+  .question-editor .editor-header {
+    align-items: flex-start;
+  }
+
+  .question-editor .editor-header h3 {
+    line-height: 1.5;
+  }
+
+  .question-editor .answer-feedback {
+    width: 100%;
+  }
+
+  .export-page .download-file {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell .topbar {
+    padding: 0 12px;
+  }
+
+  .app-shell .topbar-left {
+    gap: 7px;
+    font-size: 11px;
+  }
+
+  .app-shell .topbar-badge {
+    padding: 7px;
+  }
+
+  .app-shell .topbar-badge span {
+    display: none;
+  }
+
+  .app-shell .main-content {
+    padding: 22px 12px;
+  }
+
+  .app-shell .page-heading h1 {
+    font-size: 26px;
+    line-height: 1.3;
+  }
+
+  .app-shell .page-heading p {
+    font-size: 12px;
+  }
+
+  .app-shell .step-indicator {
+    gap: 3px;
+  }
+
+  .app-shell .step-item {
+    gap: 4px;
+    font-size: 9px;
+  }
+
+  .app-shell .step-number {
+    width: 23px;
+    height: 23px;
+    font-size: 10px;
+  }
+
+  .app-shell .step-chevron {
+    width: 10px;
+    min-width: 10px;
+    margin: 0 2px;
+  }
+
+  .generate-page .panel,
+  .review-page .panel,
+  .export-page .panel {
+    padding: 17px;
+  }
+
+  .generate-page .section-title,
+  .export-page .section-title {
+    gap: 10px;
+  }
+
+  .generate-page .icon-bubble,
+  .export-page .icon-bubble {
+    width: 36px;
+    height: 36px;
+  }
+
+  .generate-page .section-title h2,
+  .export-page .section-title h2 {
+    font-size: 14px;
+  }
+
+  .generate-page .mode-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .generate-page .mode-card {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .generate-page .options-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .question-editor .question-badge {
+    width: 34px;
+    height: 34px;
+  }
+
+  .question-editor .editor-header h3 {
+    font-size: 13px;
+  }
+
+  .question-editor .answer-item {
+    padding: 9px;
+  }
+
+  .question-editor .answer-main {
+    gap: 6px;
+  }
+
+  .question-editor .answer-letter {
+    min-width: 12px;
+  }
+
+  .question-editor .answer-feedback {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+  }
+
+  .question-editor .answer-feedback input {
+    width: 100%;
+  }
+
+  .export-page .download-file-info strong {
+    font-size: 11px;
+  }
+
+  .export-page .download-file-info small {
+    font-size: 10px;
+  }
+
+  .app-shell .main-footer {
+    padding: 16px 12px;
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
