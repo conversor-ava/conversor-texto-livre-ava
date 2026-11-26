@@ -37,8 +37,9 @@ const modes: {
 ]
 
 export function GenerationOptions() {
-  const { config, updateConfig } = useEvaluation()
+  const { config, updateConfig, busy } = useEvaluation()
   const isAI = config.mode !== 'manual'
+  const isBusy = busy !== null
 
   return (
     <section className="panel">
@@ -70,6 +71,7 @@ export function GenerationOptions() {
               config.mode === value ? 'selected' : ''
             }`}
             aria-pressed={config.mode === value}
+            disabled={isBusy}
             onClick={() => updateConfig({ mode: value })}
           >
             <Icon size={23} />
@@ -93,6 +95,7 @@ export function GenerationOptions() {
               type="number"
               min={1}
               max={20}
+              disabled={isBusy}
               value={config.quantity}
               onChange={event =>
                 updateConfig({
@@ -112,6 +115,7 @@ export function GenerationOptions() {
 
             <select
               id="difficulty"
+              disabled={isBusy}
               value={config.difficulty}
               onChange={event =>
                 updateConfig({
@@ -135,6 +139,7 @@ export function GenerationOptions() {
 
           <select
             id="alternatives"
+            disabled={isBusy}
             value={config.alternatives}
             onChange={event =>
               updateConfig({
@@ -164,6 +169,7 @@ export function GenerationOptions() {
               type="number"
               min={1}
               max={20}
+              disabled={isBusy}
               value={config.topK}
               onChange={event =>
                 updateConfig({
@@ -186,6 +192,7 @@ export function GenerationOptions() {
 
           <input
             id="rag-topic"
+            disabled={isBusy}
             value={config.topic}
             onChange={event =>
               updateConfig({

@@ -23,6 +23,10 @@ export function GeneratePage() {
   const isGenerating = busy === 'generate'
 
   async function handleContinue() {
+    if (busy !== null) {
+      return
+    }
+
     const success = await generate()
 
     if (success) {

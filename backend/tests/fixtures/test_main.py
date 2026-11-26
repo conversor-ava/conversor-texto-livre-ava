@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
-from app.llm.base import LLMGenerationError
+from app.llm.base import LLMGenerationError, LLMTimeoutError
 from app.main import app
 from app.schemas import QuestionSetSchema
 
@@ -174,3 +174,57 @@ def test_suggestions_handles_ollama_unavailable() -> None:
     assert response.json()["detail"] == (
         "Serviço de sugestões indisponível."
     )
+
+
+def test_suggestions_returns_504_on_timeout() -> None:
+    with patch(
+        "app.main.suggest_questions",
+        new_callable=AsyncMock,
+        side_effect=LLMTimeoutError("timeout"),
+    ):
+        response = client.post(
+            "/api/suggestions",
+            json={"texto": "Texto de exemplo"},
+        )
+
+    assert response.status_code == 504
+    assert "demorou mais que o esperado" in response.json()["detail"]
+
+
+def test_suggestions_best_effort_persists_without_breaking_when_db_fails() -> None:
+    question_set = QuestionSetSchema.model_validate(criar_questao_valida())
+
+    with (
+        patch(
+            "app.main.suggest_questions",
+            new_callable=AsyncMock,
+            return_value=question_set,
+        ),
+        patch(
+            "app.repositories.geracao.salvar_geracao",
+            new_callable=AsyncMock,
+            side_effect=OSError("Banco offline"),
+        ),
+    ):
+        response = client.post(
+            "/api/suggestions",
+            json={
+                "texto": "Python é uma linguagem de programação.",
+                "quantidade": 1,
+                "dificuldade": "facil",
+                "alternativas": 2,
+            },
+        )
+
+    assert response.status_code == 200
+    assert len(response.json()["questions"]) == 1
+
+
+def test_cors_allows_local_vite_origin() -> None:
+    response = client.get(
+        "/health",
+        headers={"Origin": "http://localhost:5173"},
+    )
+
+    assert response.status_code == 200
+    assert response.headers.get("access-control-allow-origin") == "http://localhost:5173"

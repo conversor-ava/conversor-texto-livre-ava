@@ -1,15 +1,35 @@
 from io import BytesIO
 from pathlib import Path
+from zipfile import BadZipFile
 
 from docx import Document
+from docx.opc.exceptions import PackageNotFoundError
 from pypdf import PdfReader
-
+from pypdf.errors import PyPdfError
 
 FORMATOS_SUPORTADOS = {".pdf", ".docx", ".txt"}
+ENCODINGS_TXT = ("utf-8-sig", "utf-8", "cp1252", "latin-1")
 
 
 class TextExtractionError(ValueError):
     pass
+
+
+def _decode_txt(content: bytes) -> str:
+    for encoding in ENCODINGS_TXT:
+        try:
+            texto = content.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+
+        if "\x00" in texto:
+            raise TextExtractionError(
+                "Não foi possível extrair o texto do documento."
+            )
+
+        return texto
+
+    raise TextExtractionError("Não foi possível extrair o texto do documento.")
 
 
 def extract_text(filename: str, content: bytes) -> str:
@@ -23,10 +43,12 @@ def extract_text(filename: str, content: bytes) -> str:
 
     try:
         if extension == ".txt":
-            texto = content.decode("utf-8-sig")
+            texto = _decode_txt(content)
 
         elif extension == ".pdf":
             reader = PdfReader(BytesIO(content))
+            if reader.is_encrypted:
+                reader.decrypt("")
             texto = "\n".join(
                 page.extract_text() or ""
                 for page in reader.pages
@@ -49,7 +71,18 @@ def extract_text(filename: str, content: bytes) -> str:
 
             texto = "\n".join(paragrafos + tabelas)
 
-    except (ValueError, UnicodeError, OSError, KeyError, EOFError) as exc:
+    except TextExtractionError:
+        raise
+    except (
+        ValueError,
+        UnicodeError,
+        OSError,
+        KeyError,
+        EOFError,
+        PyPdfError,
+        BadZipFile,
+        PackageNotFoundError,
+    ) as exc:
         raise TextExtractionError(
             "Não foi possível extrair o texto do documento."
         ) from exc
@@ -57,6 +90,10 @@ def extract_text(filename: str, content: bytes) -> str:
     texto = texto.strip()
 
     if not texto:
+        if extension == ".pdf":
+            raise TextExtractionError(
+                "O PDF não possui texto selecionável. Verifique se o arquivo não está digitalizado apenas como imagem."
+            )
         raise TextExtractionError(
             "O documento não possui texto extraível."
         )

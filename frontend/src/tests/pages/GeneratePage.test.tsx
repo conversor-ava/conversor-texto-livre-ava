@@ -266,4 +266,83 @@ describe('página de preparação do material', () => {
       screen.queryByText('REVISÃO ABERTA')
     ).not.toBeInTheDocument()
   })
+
+  it('bloqueia controles e evita duplo clique durante geração com IA', async () => {
+    let resolvePending!: (value: { questions: ReturnType<typeof emptyQuestion>[] }) => void
+
+    vi.mocked(suggestQuestions).mockImplementation(
+      () =>
+        new Promise(resolve => {
+          resolvePending = resolve
+        })
+    )
+
+    setup()
+
+    fireEvent.change(
+      screen.getByLabelText('Conteúdo do material'),
+      {
+        target: {
+          value: 'Conteúdo sobre redes de computadores.'
+        }
+      }
+    )
+
+    selectSimpleMode()
+
+    const submitButton = screen.getByRole('button', {
+      name: /Criar sugestões e continuar/i
+    })
+
+    fireEvent.click(submitButton)
+    fireEvent.click(submitButton)
+
+    expect(suggestQuestions).toHaveBeenCalledTimes(1)
+    expect(submitButton).toBeDisabled()
+    expect(
+      screen.getByRole('button', {
+        name: /Criar manualmente/i
+      })
+    ).toBeDisabled()
+    expect(
+      screen.getByLabelText('Conteúdo do material')
+    ).toBeDisabled()
+
+    const question = emptyQuestion(1, 4)
+    question.text = 'O que é TCP?'
+
+    resolvePending({ questions: [question] })
+
+    expect(
+      await screen.findByText('REVISÃO ABERTA')
+    ).toBeInTheDocument()
+  })
+
+  it('exibe mensagem de erro da API quando a geração falha', async () => {
+    vi.mocked(suggestQuestions).mockRejectedValue(
+      new Error('A IA retornou sugestões em formato inválido.')
+    )
+
+    setup()
+
+    fireEvent.change(
+      screen.getByLabelText('Conteúdo do material'),
+      {
+        target: {
+          value: 'Conteúdo válido.'
+        }
+      }
+    )
+
+    selectSimpleMode()
+    continuePreparation()
+
+    expect(
+      await screen.findByRole('alert')
+    ).toHaveTextContent('A IA retornou sugestões em formato inválido.')
+
+    expect(
+      screen.queryByText('REVISÃO ABERTA')
+    ).not.toBeInTheDocument()
+  })
 })

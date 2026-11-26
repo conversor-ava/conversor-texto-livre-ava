@@ -1,7 +1,7 @@
 import httpx
 import pytest
 
-from app.llm import LLMGenerationError
+from app.llm.base import LLMGenerationError, LLMTimeoutError
 from app.llm.providers.ollama import OllamaProvider
 
 
@@ -56,6 +56,9 @@ async def test_generate_retorna_texto_da_resposta_do_ollama(monkeypatch: pytest.
     assert cliente_falso.chamadas[0][1]["model"] == "llama3.2"
     assert cliente_falso.chamadas[0][1]["prompt"] == "gere questoes"
     assert cliente_falso.chamadas[0][1]["stream"] is False
+    assert cliente_falso.chamadas[0][1]["format"] == "json"
+    assert cliente_falso.chamadas[0][1]["options"]["num_ctx"] > 0
+    assert cliente_falso.chamadas[0][1]["options"]["num_predict"] > 0
 
 
 async def test_generate_usa_url_base_configurada(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -92,6 +95,34 @@ async def test_generate_levanta_erro_quando_status_http_e_de_falha(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     cliente_falso = _ClienteFalso(resposta=_RespostaFalsa({}, status_code=500))
+    _instala_cliente_falso(monkeypatch, cliente_falso)
+
+    provedor = OllamaProvider()
+
+    with pytest.raises(LLMGenerationError):
+        await provedor.generate("prompt")
+
+
+async def test_generate_levanta_timeout_error_quando_expira(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    cliente_falso = _ClienteFalso(excecao=httpx.ReadTimeout("tempo esgotado"))
+    _instala_cliente_falso(monkeypatch, cliente_falso)
+
+    provedor = OllamaProvider()
+
+    with pytest.raises(LLMTimeoutError):
+        await provedor.generate("prompt")
+
+
+async def test_generate_levanta_erro_quando_corpo_nao_e_json(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class _RespostaNaoJson(_RespostaFalsa):
+        def json(self) -> dict:
+            raise ValueError("json invalido")
+
+    cliente_falso = _ClienteFalso(resposta=_RespostaNaoJson({}))
     _instala_cliente_falso(monkeypatch, cliente_falso)
 
     provedor = OllamaProvider()

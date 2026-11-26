@@ -111,3 +111,39 @@ def test_categoria_repetida_nao_duplica_elemento() -> None:
 
     categorias = raiz.findall("question[@type='category']")
     assert len(categorias) == 1
+
+
+def test_sanitiza_caracteres_de_controle_e_escapa_especiais() -> None:
+    question_set = QuestionSetSchema(
+        questions=[
+            {
+                "name": "Operadores \x00<>&",
+                "text": "Se x < 5 & y > 2\x0b, qual o resultado?\x1f",
+                "answers": [
+                    {
+                        "text": "x < y & z > 0\x07",
+                        "is_correct": True,
+                        "feedback": "Correto: <tag> & \"aspas\"\x0c.",
+                    },
+                    {
+                        "text": "Nenhuma das anteriores",
+                        "is_correct": False,
+                        "feedback": "Incorreto\x08.",
+                    },
+                ],
+                "general_feedback": "Explicação com & e < >\x02.",
+                "category": "Lógica\x01 & Conjuntos",
+            }
+        ]
+    )
+
+    xml_string = convert_to_moodle_xml(question_set)
+    raiz = ET.fromstring(xml_string)
+    questao = raiz.find("question[@type='multichoice']")
+
+    assert questao is not None
+    assert questao.find("name/text").text == "Operadores <>&"
+    assert questao.find("questiontext/text").text == "Se x < 5 & y > 2, qual o resultado?"
+    assert questao.find("answer[@fraction='100']/text").text == "x < y & z > 0"
+    assert questao.find("answer[@fraction='100']/feedback/text").text == 'Correto: <tag> & "aspas".'
+    assert raiz.find("question[@type='category']/category/text").text == "$course$/top/Lógica & Conjuntos"

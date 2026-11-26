@@ -104,4 +104,21 @@ describe('falhas de comunicação com o serviço', () => {
       'Não conseguimos concluir sua solicitação neste momento.'
     )
   })
+
+  it('orienta o usuário quando recebe status 504 do servidor', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 504,
+        json: async () => ({})
+      })
+    )
+
+    await expect(
+      suggestQuestions('simple', params)
+    ).rejects.toThrow(
+      'A solicitação demorou mais que o esperado.'
+    )
+  })
 })

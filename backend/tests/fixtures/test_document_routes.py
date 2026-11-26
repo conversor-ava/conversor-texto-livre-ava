@@ -98,3 +98,69 @@ def test_extract_file_too_large() -> None:
     )
 
     assert response.status_code == 413
+
+
+def test_extract_accepts_file_up_to_25_mb() -> None:
+    assert MAX_FILE_SIZE == 25 * 1024 * 1024
+
+    response = client.post(
+        "/api/extract-text",
+        files={
+            "file": (
+                "limite.txt",
+                b"a" * MAX_FILE_SIZE,
+                "text/plain",
+            )
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["characters"] == MAX_FILE_SIZE
+
+
+def test_extract_corrupted_pdf_returns_422() -> None:
+    response = client.post(
+        "/api/extract-text",
+        files={
+            "file": (
+                "corrompido.pdf",
+                b"PDF invalido",
+                "application/pdf",
+            )
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_extract_corrupted_docx_returns_422() -> None:
+    response = client.post(
+        "/api/extract-text",
+        files={
+            "file": (
+                "corrompido.docx",
+                b"DOCX invalido",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            )
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_extract_txt_latin1_success() -> None:
+    texto = "Ação, coração e café"
+
+    response = client.post(
+        "/api/extract-text",
+        files={
+            "file": (
+                "latin1.txt",
+                texto.encode("latin-1"),
+                "text/plain",
+            )
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["text"] == texto

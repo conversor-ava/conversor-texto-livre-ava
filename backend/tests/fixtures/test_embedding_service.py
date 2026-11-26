@@ -3,6 +3,7 @@ import pytest
 
 from app.services.embedding_service import (
     EmbeddingError,
+    EmbeddingTimeoutError,
     OllamaEmbeddingService,
 )
 
@@ -149,3 +150,76 @@ async def test_embed_rejects_invalid_vector_values(
 
     with pytest.raises(EmbeddingError):
         await service.embed(["Python"])
+
+
+@pytest.mark.asyncio
+async def test_embed_rejects_zero_vector(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    criar_cliente_mock(
+        monkeypatch,
+        {"embeddings": [[0.0, 0.0, 0.0]]},
+    )
+
+    service = OllamaEmbeddingService()
+
+    with pytest.raises(EmbeddingError):
+        await service.embed(["Python"])
+
+
+@pytest.mark.asyncio
+async def test_embed_raises_timeout_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class _TimeoutClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def post(self, *args, **kwargs):
+            raise httpx.ReadTimeout("timeout")
+
+    monkeypatch.setattr(
+        "app.services.embedding_service.httpx.AsyncClient",
+        lambda **kwargs: _TimeoutClient(),
+    )
+
+    service = OllamaEmbeddingService()
+
+    with pytest.raises(EmbeddingTimeoutError):
+        await service.embed(["Python"])
+
+
+@pytest.mark.asyncio
+async def test_embed_splits_large_batches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    chamadas: list[int] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        import json
+
+        body = json.loads(request.content.decode("utf-8"))
+        textos = body["input"]
+        chamadas.append(len(textos))
+        return httpx.Response(
+            status_code=200,
+            json={"embeddings": [[0.1, 0.2] for _ in textos]},
+        )
+
+    client_original = httpx.AsyncClient
+    monkeypatch.setattr(
+        "app.services.embedding_service.httpx.AsyncClient",
+        lambda **kwargs: client_original(
+            transport=httpx.MockTransport(handler),
+            **kwargs,
+        ),
+    )
+
+    service = OllamaEmbeddingService()
+    result = await service.embed([f"texto {i}" for i in range(20)])
+
+    assert chamadas == [16, 4]
+    assert len(result) == 20

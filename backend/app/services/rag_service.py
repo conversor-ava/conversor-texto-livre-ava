@@ -23,6 +23,9 @@ class RAGService:
             overlap=self.overlap,
         )
 
+        if not chunks:
+            raise ValueError("Não foi possível segmentar o documento.")
+
         embeddings = await self.embedding_service.embed(
             [chunk.text for chunk in chunks]
         )

@@ -17,6 +17,11 @@ def cosine_similarity(
     if not vector_a or len(vector_a) != len(vector_b):
         raise ValueError("Os vetores devem possuir a mesma dimensão.")
 
+    if not all(math.isfinite(value) for value in vector_a) or not all(
+        math.isfinite(value) for value in vector_b
+    ):
+        raise ValueError("Os vetores contêm valores inválidos.")
+
     norm_a = math.sqrt(sum(value * value for value in vector_a))
     norm_b = math.sqrt(sum(value * value for value in vector_b))
 
@@ -84,6 +89,11 @@ class InMemoryVectorStore:
 
         if len(query_embedding) != self._dimensions:
             raise ValueError("Dimensão da consulta incompatível.")
+
+        if not all(math.isfinite(value) for value in query_embedding) or not any(
+            value != 0 for value in query_embedding
+        ):
+            raise ValueError("Vetor de consulta inválido.")
 
         results = [
             SearchResult(

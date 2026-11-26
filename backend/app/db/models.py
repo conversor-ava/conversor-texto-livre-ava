@@ -1,8 +1,8 @@
 import enum
-from datetime import datetime
+from datetime import datetime, timezone
 
-from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy import JSON, ForeignKey, String, Text
+from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -18,7 +18,9 @@ class Geracao(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     texto_base: Mapped[str] = mapped_column(Text().with_variant(LONGTEXT(), "mysql"))
     parametros: Mapped[dict] = mapped_column(JSON)
-    data_hora: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    data_hora: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(timezone.utc)
+    )
     status: Mapped[StatusGeracao] = mapped_column(default=StatusGeracao.PENDENTE)
 
     questoes: Mapped[list["Questao"]] = relationship(

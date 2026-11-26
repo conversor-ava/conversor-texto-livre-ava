@@ -5,6 +5,10 @@ class LLMGenerationError(Exception):
     pass
 
 
+class LLMTimeoutError(LLMGenerationError):
+    pass
+
+
 class LLMProvider(ABC):
 
     @abstractmethod
