@@ -5,7 +5,13 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.db.base import Base
 from app.db.models import Alternativa, Geracao, Questao, StatusGeracao
-from app.repositories.geracao import montar_geracao, registrar_falha, salvar_geracao
+from app.repositories.geracao import (
+    montar_geracao,
+    persistir_falha_best_effort,
+    persistir_geracao_best_effort,
+    registrar_falha,
+    salvar_geracao,
+)
 from app.schemas import QuestionSetSchema
 
 PARAMETROS = {"modo": "simples", "quantidade": 2, "dificuldade": "medio", "alternativas": 3}
@@ -172,3 +178,58 @@ async def test_registrar_falha_grava_sem_questoes(fabrica):
         assert gravada.texto_base == "texto"
         assert gravada.parametros == PARAMETROS
         assert await _contar(nova, Questao) == 0
+
+
+@pytest.mark.asyncio
+async def test_persistir_best_effort_grava_quando_sessao_disponivel(
+    fabrica, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("app.db.session.AsyncSessionLocal", fabrica)
+
+    ok_sucesso = await persistir_geracao_best_effort(
+        texto_base="texto", parametros=PARAMETROS, conjunto=_criar_conjunto()
+    )
+    ok_falha = await persistir_falha_best_effort(
+        texto_base="texto falha", parametros=PARAMETROS
+    )
+
+    assert ok_sucesso is True
+    assert ok_falha is True
+
+    async with fabrica() as nova:
+        assert await _contar(nova, Geracao) == 2
+
+
+@pytest.mark.asyncio
+async def test_persistir_best_effort_nao_quebra_quando_banco_falha(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("app.db.session.AsyncSessionLocal", None)
+
+    assert (
+        await persistir_geracao_best_effort(
+            texto_base="texto", parametros=PARAMETROS, conjunto=_criar_conjunto()
+        )
+        is False
+    )
+    assert await persistir_falha_best_effort(texto_base="texto", parametros=PARAMETROS) is False
+
+    class _SessaoComErro:
+        async def __aenter__(self):
+            raise OSError("MySQL indisponível")
+
+        async def __aexit__(self, *args):
+            return None
+
+    monkeypatch.setattr(
+        "app.db.session.AsyncSessionLocal",
+        lambda: _SessaoComErro(),
+    )
+
+    assert (
+        await persistir_geracao_best_effort(
+            texto_base="texto", parametros=PARAMETROS, conjunto=_criar_conjunto()
+        )
+        is False
+    )
+    assert await persistir_falha_best_effort(texto_base="texto", parametros=PARAMETROS) is False

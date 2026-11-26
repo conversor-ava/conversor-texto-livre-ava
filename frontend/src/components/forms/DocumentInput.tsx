@@ -68,6 +68,7 @@ export function DocumentInput() {
           accept=".pdf,.docx,.txt"
           aria-label="Selecionar arquivo"
           className="visually-hidden"
+          disabled={busy !== null}
           onChange={selectFile}
         />
 
@@ -108,6 +109,7 @@ export function DocumentInput() {
           <button
             type="button"
             aria-label="Remover documento"
+            disabled={busy !== null}
             onClick={() =>
               updateConfig({
                 filename: null,
@@ -134,6 +136,7 @@ export function DocumentInput() {
       <textarea
         id="source-text"
         className="source-textarea"
+        disabled={busy !== null}
         value={config.text}
         onChange={event =>
           updateConfig({

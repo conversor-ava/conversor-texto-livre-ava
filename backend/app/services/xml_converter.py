@@ -1,18 +1,24 @@
 from __future__ import annotations
 
+import re
 import xml.etree.ElementTree as ET
 
 from app.schemas import QuestionSchema, QuestionSetSchema
 
 DEFAULT_GRADE = "1.0000000"
 DEFAULT_PENALTY = "0.3333333"
+INVALID_XML_CHARS_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+
+
+def _sanitize_xml_text(content: str) -> str:
+    return INVALID_XML_CHARS_RE.sub("", content)
 
 
 def _add_text_element(parent: ET.Element, tag: str, content: str, format_: str = "html") -> ET.Element:
     element = ET.SubElement(parent, tag)
     element.set("format", format_)
     text_element = ET.SubElement(element, "text")
-    text_element.text = content
+    text_element.text = _sanitize_xml_text(content)
     return element
 
 
@@ -20,7 +26,7 @@ def _build_category_element(category: str) -> ET.Element:
     question_element = ET.Element("question", {"type": "category"})
     category_element = ET.SubElement(question_element, "category")
     text_element = ET.SubElement(category_element, "text")
-    text_element.text = f"$course$/top/{category}"
+    text_element.text = f"$course$/top/{_sanitize_xml_text(category)}"
     return question_element
 
 
@@ -29,7 +35,7 @@ def _build_question_element(question: QuestionSchema) -> ET.Element:
 
     name_element = ET.SubElement(question_element, "name")
     name_text_element = ET.SubElement(name_element, "text")
-    name_text_element.text = question.name
+    name_text_element.text = _sanitize_xml_text(question.name)
 
     _add_text_element(question_element, "questiontext", question.text)
 
@@ -49,7 +55,7 @@ def _build_question_element(question: QuestionSchema) -> ET.Element:
             question_element, "answer", {"fraction": fraction, "format": "html"}
         )
         answer_text_element = ET.SubElement(answer_element, "text")
-        answer_text_element.text = alternativa.text
+        answer_text_element.text = _sanitize_xml_text(alternativa.text)
         if alternativa.feedback:
             _add_text_element(answer_element, "feedback", alternativa.feedback)
 
@@ -61,9 +67,10 @@ def convert_to_moodle_xml(question_set: QuestionSetSchema) -> str:
     categorias_ja_adicionadas: set[str] = set()
 
     for question in question_set.questions:
-        if question.category and question.category not in categorias_ja_adicionadas:
-            quiz_element.append(_build_category_element(question.category))
-            categorias_ja_adicionadas.add(question.category)
+        categoria_limpa = _sanitize_xml_text(question.category) if question.category else None
+        if categoria_limpa and categoria_limpa not in categorias_ja_adicionadas:
+            quiz_element.append(_build_category_element(categoria_limpa))
+            categorias_ja_adicionadas.add(categoria_limpa)
         quiz_element.append(_build_question_element(question))
 
     ET.indent(quiz_element, space="  ")

@@ -3,13 +3,20 @@ import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, ValidationError
 
-from app.llm.base import LLMGenerationError
+from app.llm.base import LLMGenerationError, LLMTimeoutError
 from app.llm.providers.ollama import OllamaProvider
+from app.repositories.geracao import (
+    persistir_falha_best_effort,
+    persistir_geracao_best_effort,
+)
 from app.schemas import QuestionSetSchema
-from app.services.embedding_service import EmbeddingError, OllamaEmbeddingService
+from app.services.embedding_service import (
+    EmbeddingError,
+    EmbeddingTimeoutError,
+    OllamaEmbeddingService,
+)
 from app.services.rag_service import RAGService
 from app.services.rag_suggestion_service import suggest_questions_with_rag
-
 
 logger = logging.getLogger(__name__)
 
@@ -32,12 +39,21 @@ class RAGSuggestionRequest(BaseModel):
 async def generate_rag_suggestions(
     request: RAGSuggestionRequest,
 ) -> QuestionSetSchema:
+    parametros = {
+        "modo": "rag",
+        "tema": request.tema,
+        "quantidade": request.quantidade,
+        "dificuldade": request.dificuldade,
+        "alternativas": request.alternativas,
+        "top_k": request.top_k,
+    }
+
     try:
         rag = RAGService(
             embedding_service=OllamaEmbeddingService(),
         )
 
-        return await suggest_questions_with_rag(
+        resultado = await suggest_questions_with_rag(
             texto=request.texto,
             tema=request.tema,
             quantidade=request.quantidade,
@@ -53,7 +69,10 @@ async def generate_rag_suggestions(
             "Resposta inválida recebida do provider de IA no RAG",
             exc_info=True,
         )
-
+        await persistir_falha_best_effort(
+            texto_base=request.texto,
+            parametros=parametros,
+        )
         raise HTTPException(
             status_code=502,
             detail="A IA retornou sugestões em formato inválido.",
@@ -65,13 +84,34 @@ async def generate_rag_suggestions(
             detail=str(exc),
         ) from exc
 
-    except (LLMGenerationError, EmbeddingError) as exc:
-        logger.error(
-            "Falha na comunicação com o Ollama durante o RAG",
-            exc_info=True,
+    except (LLMTimeoutError, EmbeddingTimeoutError) as exc:
+        logger.exception("Tempo limite excedido no Ollama durante o RAG")
+        await persistir_falha_best_effort(
+            texto_base=request.texto,
+            parametros=parametros,
         )
+        raise HTTPException(
+            status_code=504,
+            detail=(
+                "O processamento com RAG demorou mais que o esperado. "
+                "Tente novamente com menos trechos ou menos questões."
+            ),
+        ) from exc
 
+    except (LLMGenerationError, EmbeddingError) as exc:
+        logger.exception("Falha na comunicação com o Ollama durante o RAG")
+        await persistir_falha_best_effort(
+            texto_base=request.texto,
+            parametros=parametros,
+        )
         raise HTTPException(
             status_code=503,
             detail="Serviço de sugestões com RAG indisponível.",
         ) from exc
+
+    await persistir_geracao_best_effort(
+        texto_base=request.texto,
+        parametros=parametros,
+        conjunto=resultado,
+    )
+    return resultado

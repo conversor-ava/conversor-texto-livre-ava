@@ -60,6 +60,12 @@ async function apiError(response: Response): Promise<never> {
     )
   }
 
+  if (response.status === 504) {
+    throw new Error(
+      'A solicitação demorou mais que o esperado. Tente novamente com um texto menor ou menos questões.'
+    )
+  }
+
   if (response.status >= 500) {
     throw new Error(
       'Não conseguimos concluir sua solicitação neste momento. Tente novamente em instantes.'

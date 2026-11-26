@@ -11,7 +11,7 @@ from app.services.text_extractor import (
 
 router = APIRouter(prefix="/api", tags=["documents"])
 
-MAX_FILE_SIZE = 5 * 1024 * 1024
+MAX_FILE_SIZE = 25 * 1024 * 1024
 
 
 class ExtractedTextResponse(BaseModel):
@@ -41,7 +41,7 @@ async def extract_document(
     if len(content) > MAX_FILE_SIZE:
         raise HTTPException(
             status_code=413,
-            detail="O arquivo excede o limite de 5 MB.",
+            detail="O arquivo excede o limite de 25 MB.",
         )
 
     try:

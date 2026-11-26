@@ -100,3 +100,14 @@ def test_vector_store_rejects_zero_vector() -> None:
             criar_chunks()[:1],
             [[0.0, 0.0]],
         )
+
+
+def test_vector_store_search_rejects_zero_or_nan_query() -> None:
+    store = InMemoryVectorStore()
+    store.add(criar_chunks()[:1], [[1.0, 0.0]])
+
+    with pytest.raises(ValueError):
+        store.search([0.0, 0.0])
+
+    with pytest.raises(ValueError):
+        store.search([float("nan"), 1.0])

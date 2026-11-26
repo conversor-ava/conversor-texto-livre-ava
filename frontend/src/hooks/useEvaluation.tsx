@@ -133,6 +133,7 @@ export function EvaluationProvider({
 
     busyRef.current = action
     setBusy(action)
+    setNotice(null)
 
     return true
   }

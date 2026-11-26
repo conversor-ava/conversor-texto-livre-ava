@@ -40,5 +40,38 @@ def test_extract_unsupported_format() -> None:
 
 
 def test_extract_invalid_pdf() -> None:
-    with pytest.raises(Exception):
+    with pytest.raises(TextExtractionError):
         extract_text("material.pdf", b"PDF invalido")
+
+
+def test_extract_invalid_docx() -> None:
+    with pytest.raises(TextExtractionError):
+        extract_text("material.docx", b"DOCX invalido")
+
+
+def test_extract_txt_latin1() -> None:
+    texto = "Ação, coração e café"
+
+    result = extract_text("material.txt", texto.encode("latin-1"))
+
+    assert result == texto
+
+
+def test_extract_pdf_without_selectable_text(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class _PaginaVazia:
+        def extract_text(self) -> str:
+            return ""
+
+    class _PdfSemTexto:
+        is_encrypted = False
+        pages = [_PaginaVazia()]
+
+    monkeypatch.setattr(
+        "app.services.text_extractor.PdfReader",
+        lambda *_args, **_kwargs: _PdfSemTexto(),
+    )
+
+    with pytest.raises(TextExtractionError, match="digitalizado"):
+        extract_text("escaneado.pdf", b"%PDF-1.4")

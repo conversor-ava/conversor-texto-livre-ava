@@ -218,3 +218,59 @@ def test_remove_markdown_fence_preserves_extra_text() -> None:
     resposta = 'Explicação:\n```json\n{"questions":[]}\n```'
 
     assert _remove_markdown_fence(resposta) == resposta
+
+
+@pytest.mark.asyncio
+async def test_suggest_questions_extracts_json_with_surrounding_text() -> None:
+    resposta = f"Segue o JSON solicitado:\n{criar_resposta()}\nFim da resposta."
+    provider = FakeProvider(resposta)
+
+    result = await suggest_questions(
+        texto="Python é uma linguagem de programação.",
+        quantidade=1,
+        dificuldade="facil",
+        alternativas=4,
+        provider=provider,
+    )
+
+    assert len(result.questions) == 1
+
+
+@pytest.mark.asyncio
+async def test_suggest_questions_splits_large_batch() -> None:
+    lote_1 = json.loads(criar_resposta(quantidade=5, alternativas=2))
+    for indice, questao in enumerate(lote_1["questions"], start=1):
+        questao["name"] = f"Questão Lote1 {indice}"
+        questao["text"] = f"Enunciado único {indice} do primeiro lote?"
+
+    lote_2 = json.loads(criar_resposta(quantidade=2, alternativas=2))
+    for indice, questao in enumerate(lote_2["questions"], start=1):
+        questao["name"] = f"Questão Lote2 {indice}"
+        questao["text"] = f"Enunciado único {indice} do segundo lote?"
+
+    respostas = [json.dumps(lote_1), json.dumps(lote_2)]
+
+    class _LoteProvider(LLMProvider):
+        def __init__(self) -> None:
+            self.prompts: list[str] = []
+
+        async def generate(self, prompt: str) -> str:
+            self.prompts.append(prompt)
+            return respostas[len(self.prompts) - 1]
+
+    provider = _LoteProvider()
+
+    result = await suggest_questions(
+        texto="Python é uma linguagem de programação.",
+        quantidade=7,
+        dificuldade="medio",
+        alternativas=2,
+        provider=provider,
+    )
+
+    assert len(provider.prompts) == 2
+    assert len(result.questions) == 7
+    assert "QUESTÕES JÁ GERADAS" not in provider.prompts[0]
+    assert "QUESTÕES JÁ GERADAS" in provider.prompts[1]
+    assert "Questão Lote1 1: Enunciado único 1 do primeiro lote?" in provider.prompts[1]
+    assert "Questão Lote1 5: Enunciado único 5 do primeiro lote?" in provider.prompts[1]

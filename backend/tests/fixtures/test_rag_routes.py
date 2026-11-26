@@ -6,7 +6,7 @@ from pydantic import ValidationError
 
 from app.main import app
 from app.schemas import QuestionSetSchema
-from app.services.embedding_service import EmbeddingError
+from app.services.embedding_service import EmbeddingError, EmbeddingTimeoutError
 
 
 client = TestClient(app)
@@ -164,3 +164,46 @@ def test_rag_endpoint_handles_invalid_ai_response(
     )
 
     assert response.status_code == 502
+
+
+def test_rag_endpoint_returns_504_on_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    suggestion_mock = AsyncMock(
+        side_effect=EmbeddingTimeoutError("Timeout nos embeddings.")
+    )
+
+    monkeypatch.setattr(
+        "app.api.rag_routes.suggest_questions_with_rag",
+        suggestion_mock,
+    )
+
+    response = client.post(
+        "/api/rag/suggestions",
+        json=criar_payload(),
+    )
+
+    assert response.status_code == 504
+    assert "demorou mais que o esperado" in response.json()["detail"]
+
+
+def test_rag_endpoint_best_effort_survives_db_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    suggestion_mock = AsyncMock(return_value=criar_question_set())
+    monkeypatch.setattr(
+        "app.api.rag_routes.suggest_questions_with_rag",
+        suggestion_mock,
+    )
+    monkeypatch.setattr(
+        "app.db.session.AsyncSessionLocal",
+        None,
+    )
+
+    response = client.post(
+        "/api/rag/suggestions",
+        json=criar_payload(),
+    )
+
+    assert response.status_code == 200
+    assert len(response.json()["questions"]) == 1
