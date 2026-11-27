@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import re
 
-from app.schemas import AnswerSchema, QuestionSchema, QuestionSetSchema
+from app.schemas import (
+    DraftAnswerSchema,
+    DraftQuestionSchema,
+    DraftQuestionSetSchema,
+)
 
 QUESTION_START_RE = re.compile(
     r"^(?:(?:quest[ãa]o|pergunta|item)\s*(\d+)[\s.:\-)—]*|(\d+)[\s.:\-)—]+)(.*)$",
@@ -44,7 +48,7 @@ def _clean_option_text(text: str) -> tuple[str, bool]:
 def parse_free_text_questions(
     texto: str,
     categoria_padrao: str | None = None,
-) -> QuestionSetSchema:
+) -> DraftQuestionSetSchema:
     linhas = [linha.strip() for linha in texto.strip().splitlines()]
     linhas = [linha for linha in linhas if linha]
 
@@ -68,7 +72,7 @@ def parse_free_text_questions(
     if bloco_atual:
         blocos_brutos.append(bloco_atual)
 
-    questoes: list[QuestionSchema] = []
+    questoes: list[DraftQuestionSchema] = []
 
     for idx, bloco in enumerate(blocos_brutos, start=1):
         primeira_linha = bloco[0]
@@ -123,7 +127,7 @@ def parse_free_text_questions(
                 f"{titulo} não possui alternativas suficientes para múltipla escolha (mínimo de 2)."
             )
 
-        respostas_finais: list[AnswerSchema] = []
+        respostas_finais: list[DraftAnswerSchema] = []
 
         letra_correta_gabarito = None
         if gabarito_explícito:
@@ -141,10 +145,10 @@ def parse_free_text_questions(
                 qtd_corretas += 1
 
             respostas_finais.append(
-                AnswerSchema(
+                DraftAnswerSchema(
                     text=texto_alt or f"Alternativa {rotulo}",
                     is_correct=is_correta,
-                    feedback= "",
+                    feedback="",
                 )
             )
 
@@ -158,7 +162,7 @@ def parse_free_text_questions(
             )
 
         questoes.append(
-            QuestionSchema(
+            DraftQuestionSchema(
                 name=titulo,
                 text=texto_enunciado,
                 answers=respostas_finais,
@@ -170,4 +174,4 @@ def parse_free_text_questions(
     if not questoes:
         raise ValueError("Nenhuma questão pôde ser identificada no texto informado.")
 
-    return QuestionSetSchema(questions=questoes)
+    return DraftQuestionSetSchema(questions=questoes)

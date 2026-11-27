@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import re
 import xml.etree.ElementTree as ET
 
@@ -14,11 +15,17 @@ def _sanitize_xml_text(content: str) -> str:
     return INVALID_XML_CHARS_RE.sub("", content)
 
 
+def _format_html_text(content: str) -> str:
+    sanitized = _sanitize_xml_text(content)
+    escaped = html.escape(sanitized, quote=False)
+    return escaped.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "<br>")
+
+
 def _add_text_element(parent: ET.Element, tag: str, content: str, format_: str = "html") -> ET.Element:
     element = ET.SubElement(parent, tag)
     element.set("format", format_)
     text_element = ET.SubElement(element, "text")
-    text_element.text = _sanitize_xml_text(content)
+    text_element.text = _format_html_text(content) if format_ == "html" else _sanitize_xml_text(content)
     return element
 
 
@@ -55,7 +62,7 @@ def _build_question_element(question: QuestionSchema) -> ET.Element:
             question_element, "answer", {"fraction": fraction, "format": "html"}
         )
         answer_text_element = ET.SubElement(answer_element, "text")
-        answer_text_element.text = _sanitize_xml_text(alternativa.text)
+        answer_text_element.text = _format_html_text(alternativa.text)
         if alternativa.feedback:
             _add_text_element(answer_element, "feedback", alternativa.feedback)
 
@@ -64,13 +71,21 @@ def _build_question_element(question: QuestionSchema) -> ET.Element:
 
 def convert_to_moodle_xml(question_set: QuestionSetSchema) -> str:
     quiz_element = ET.Element("quiz")
-    categorias_ja_adicionadas: set[str] = set()
+    categoria_atual: str | None = None
 
-    for question in question_set.questions:
-        categoria_limpa = _sanitize_xml_text(question.category) if question.category else None
-        if categoria_limpa and categoria_limpa not in categorias_ja_adicionadas:
+    # Questões sem categoria vêm primeiro para não herdarem a categoria anterior no Moodle
+    questoes_ordenadas = sorted(
+        question_set.questions,
+        key=lambda q: 0 if not (q.category and _sanitize_xml_text(q.category).strip()) else 1,
+    )
+
+    for question in questoes_ordenadas:
+        categoria_limpa = (
+            _sanitize_xml_text(question.category).strip() if question.category else ""
+        )
+        if categoria_limpa and categoria_limpa != categoria_atual:
             quiz_element.append(_build_category_element(categoria_limpa))
-            categorias_ja_adicionadas.add(categoria_limpa)
+            categoria_atual = categoria_limpa
         quiz_element.append(_build_question_element(question))
 
     ET.indent(quiz_element, space="  ")

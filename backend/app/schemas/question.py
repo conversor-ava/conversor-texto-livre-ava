@@ -16,19 +16,19 @@ class AnswerSchema(BaseModel):
     text: str = Field(
         ...,
         min_length=1,
-        description="Texto da alternativa"
+        description="Texto da alternativa",
     )
 
     is_correct: bool = Field(
         ...,
         strict=True,
-        description="Indica se a alternativa está correta"
+        description="Indica se a alternativa está correta",
     )
 
     feedback: str = Field(
         ...,
         min_length=1,
-        description="Justificativa da alternativa"
+        description="Justificativa da alternativa",
     )
 
     @field_validator("text", "feedback")
@@ -46,18 +46,18 @@ class QuestionSchema(BaseModel):
     name: str = Field(
         ...,
         min_length=1,
-        max_length=255
+        max_length=255,
     )
 
     text: str = Field(
         ...,
-        min_length=1
+        min_length=1,
     )
 
     answers: list[AnswerSchema] = Field(
         ...,
         min_length=MIN_ALTERNATIVAS,
-        max_length=MAX_ALTERNATIVAS
+        max_length=MAX_ALTERNATIVAS,
     )
 
     general_feedback: str | None = None
@@ -102,7 +102,7 @@ class QuestionSchema(BaseModel):
 class QuestionSetSchema(BaseModel):
     questions: list[QuestionSchema] = Field(
         ...,
-        min_length=1
+        min_length=1,
     )
 
     @model_validator(mode="after")
@@ -134,3 +134,97 @@ class QuestionSetSchema(BaseModel):
                     )
 
         return self
+
+
+class DraftAnswerSchema(BaseModel):
+    text: str = Field(
+        ...,
+        min_length=1,
+        description="Texto da alternativa",
+    )
+
+    is_correct: bool = Field(
+        ...,
+        strict=True,
+        description="Indica se a alternativa está correta",
+    )
+
+    feedback: str = Field(
+        default="",
+        description="Justificativa da alternativa (opcional no rascunho)",
+    )
+
+    @field_validator("text")
+    @classmethod
+    def validar_texto_alternativa(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("A alternativa não pode estar vazia")
+        return value
+
+    @field_validator("feedback")
+    @classmethod
+    def limpar_feedback(cls, value: str) -> str:
+        return value.strip()
+
+
+class DraftQuestionSchema(BaseModel):
+    name: str = Field(
+        ...,
+        min_length=1,
+        max_length=255,
+    )
+
+    text: str = Field(
+        ...,
+        min_length=1,
+    )
+
+    answers: list[DraftAnswerSchema] = Field(
+        ...,
+        min_length=MIN_ALTERNATIVAS,
+        max_length=MAX_ALTERNATIVAS,
+    )
+
+    general_feedback: str | None = None
+
+    category: str | None = Field(default=None, max_length=255)
+
+    @field_validator("name", "text")
+    @classmethod
+    def validar_campos_obrigatorios(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("O campo não pode estar vazio")
+        return value
+
+    @model_validator(mode="after")
+    def validar_alternativas(self) -> DraftQuestionSchema:
+        corretas = sum(
+            alternativa.is_correct
+            for alternativa in self.answers
+        )
+
+        if corretas != 1:
+            raise ValueError(
+                "Cada questão deve possuir exatamente uma alternativa correta"
+            )
+
+        textos = [
+            alternativa.text.casefold()
+            for alternativa in self.answers
+        ]
+
+        if len(textos) != len(set(textos)):
+            raise ValueError(
+                "A questão contém alternativas duplicadas"
+            )
+
+        return self
+
+
+class DraftQuestionSetSchema(BaseModel):
+    questions: list[DraftQuestionSchema] = Field(
+        ...,
+        min_length=1,
+    )

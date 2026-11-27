@@ -1,5 +1,4 @@
 import logging
-import os
 
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,30 +6,21 @@ from pydantic import BaseModel, Field, ValidationError
 
 from app.api.document_routes import router as document_router
 from app.api.rag_routes import router as rag_router
+from app.core.config import settings
 from app.llm.base import LLMGenerationError, LLMTimeoutError
 from app.llm.providers.ollama import OllamaProvider
 from app.repositories.geracao import (
     persistir_falha_best_effort,
     persistir_geracao_best_effort,
 )
-from app.schemas import QuestionSetSchema
+from app.schemas import DraftQuestionSetSchema, QuestionSetSchema
 from app.services.question_suggestion import suggest_questions
 from app.services.text_quiz_parser import parse_free_text_questions
 from app.services.xml_converter import convert_to_moodle_xml
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CORS_ORIGINS = (
-    "http://localhost:5173,http://127.0.0.1:5173,"
-    "http://localhost:4173,http://127.0.0.1:4173"
-)
 MAX_SIMPLE_IA_CHARS = 15000
-
-
-def _get_cors_origins() -> list[str]:
-    raw_origins = os.getenv("CORS_ORIGINS", DEFAULT_CORS_ORIGINS)
-    return [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
-
 
 app = FastAPI(
     title="Conversor Inteligente Texto Livre para AVA",
@@ -43,7 +33,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_get_cors_origins(),
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -86,9 +76,9 @@ async def convert_questions(question_set: QuestionSetSchema) -> Response:
 @app.post(
     "/api/parse-text",
     tags=["conversion"],
-    response_model=QuestionSetSchema,
+    response_model=DraftQuestionSetSchema,
 )
-async def parse_text_route(request: ParseTextRequest) -> QuestionSetSchema:
+async def parse_text_route(request: ParseTextRequest) -> DraftQuestionSetSchema:
     try:
         return parse_free_text_questions(
             texto=request.texto,
@@ -141,6 +131,7 @@ async def generate_suggestions(
         await persistir_falha_best_effort(
             texto_base=request.texto,
             parametros=parametros,
+            resposta_bruta_ia=getattr(exc, "raw_response", None),
         )
         raise HTTPException(
             status_code=502,
