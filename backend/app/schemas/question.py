@@ -10,6 +10,7 @@ from pydantic import (
 
 MIN_ALTERNATIVAS = 2
 MAX_ALTERNATIVAS = 8
+MAX_QUESTOES_LOTE = 100
 
 
 class AnswerSchema(BaseModel):
@@ -74,6 +75,14 @@ class QuestionSchema(BaseModel):
 
         return value
 
+    @field_validator("category")
+    @classmethod
+    def limpar_categoria(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        limpa = value.strip()
+        return limpa or None
+
     @model_validator(mode="after")
     def validar_alternativas(self) -> QuestionSchema:
         corretas = sum(
@@ -103,6 +112,7 @@ class QuestionSetSchema(BaseModel):
     questions: list[QuestionSchema] = Field(
         ...,
         min_length=1,
+        max_length=MAX_QUESTOES_LOTE,
     )
 
     @model_validator(mode="after")
@@ -198,6 +208,14 @@ class DraftQuestionSchema(BaseModel):
             raise ValueError("O campo não pode estar vazio")
         return value
 
+    @field_validator("category")
+    @classmethod
+    def limpar_categoria(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        limpa = value.strip()
+        return limpa or None
+
     @model_validator(mode="after")
     def validar_alternativas(self) -> DraftQuestionSchema:
         corretas = sum(
@@ -227,4 +245,5 @@ class DraftQuestionSetSchema(BaseModel):
     questions: list[DraftQuestionSchema] = Field(
         ...,
         min_length=1,
+        max_length=MAX_QUESTOES_LOTE,
     )

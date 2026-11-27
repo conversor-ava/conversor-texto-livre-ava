@@ -1,7 +1,10 @@
 import logging
 
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, ValidationError
 
 from app.api.document_routes import router as document_router
@@ -41,6 +44,68 @@ app.add_middleware(
 
 app.include_router(document_router)
 app.include_router(rag_router)
+
+
+def _traduzir_erro_validacao(erro: dict) -> dict:
+    tipo = erro.get("type", "")
+    ctx = erro.get("ctx") or {}
+    campo = " -> ".join(str(parte) for parte in erro.get("loc", []))
+    mensagem = erro.get("msg", "Valor inválido.")
+
+    if tipo == "missing":
+        mensagem = f"O campo '{campo}' é obrigatório. Preencha-o e tente novamente."
+    elif tipo == "string_too_short":
+        minimo = ctx.get("min_length", 1)
+        mensagem = (
+            f"O campo '{campo}' deve ter pelo menos {minimo} caractere(s). "
+            "Complete o conteúdo antes de continuar."
+        )
+    elif tipo == "string_too_long":
+        maximo = ctx.get("max_length")
+        mensagem = (
+            f"O campo '{campo}' excedeu o limite de {maximo} caracteres. "
+            "Reduza o texto e tente novamente."
+        )
+    elif tipo == "greater_than_equal":
+        minimo = ctx.get("ge")
+        mensagem = (
+            f"O valor de '{campo}' deve ser maior ou igual a {minimo}. "
+            "Ajuste o parâmetro e tente novamente."
+        )
+    elif tipo == "less_than_equal":
+        maximo = ctx.get("le")
+        mensagem = (
+            f"O valor de '{campo}' deve ser menor ou igual a {maximo}. "
+            "Reduza a quantidade solicitada e tente novamente."
+        )
+    elif tipo == "too_short":
+        minimo = ctx.get("min_length", 1)
+        mensagem = (
+            f"A lista '{campo}' precisa conter no mínimo {minimo} item(ns). "
+            "Adicione os itens faltantes e tente novamente."
+        )
+    elif tipo == "too_long":
+        maximo = ctx.get("max_length")
+        mensagem = (
+            f"A lista '{campo}' excedeu o limite máximo de {maximo} item(ns). "
+            "Divida o envio em lotes menores e tente novamente."
+        )
+    elif mensagem.startswith("Value error, "):
+        mensagem = mensagem.removeprefix("Value error, ")
+
+    return {**erro, "msg": mensagem}
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError,
+) -> JSONResponse:
+    erros_traduzidos = [_traduzir_erro_validacao(err) for err in exc.errors()]
+    return JSONResponse(
+        status_code=422,
+        content=jsonable_encoder({"detail": erros_traduzidos}),
+    )
 
 
 class SuggestionRequest(BaseModel):
@@ -135,7 +200,10 @@ async def generate_suggestions(
         )
         raise HTTPException(
             status_code=502,
-            detail="A IA retornou sugestões em formato inválido.",
+            detail=(
+                "A IA retornou sugestões em formato inválido. "
+                "Tente gerar novamente ou reduza a quantidade de questões por pedido."
+            ),
         ) from exc
 
     except ValueError as exc:
@@ -166,7 +234,10 @@ async def generate_suggestions(
         )
         raise HTTPException(
             status_code=503,
-            detail="Serviço de sugestões indisponível.",
+            detail=(
+                "Serviço de sugestões indisponível. "
+                "Verifique se o Ollama está em execução ou continue no modo manual."
+            ),
         ) from exc
 
     await persistir_geracao_best_effort(

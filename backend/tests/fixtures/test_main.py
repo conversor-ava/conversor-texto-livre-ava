@@ -17,7 +17,7 @@ def criar_questao_valida() -> dict:
             {
                 "name": "Capital do Brasil",
                 "text": "Qual é a capital do Brasil?",
-                                "answers": [
+                "answers": [
                     {
                         "text": "Brasília",
                         "is_correct": True,
@@ -154,9 +154,7 @@ def test_suggestions_handles_invalid_ai_response() -> None:
         )
 
     assert response.status_code == 502
-    assert response.json()["detail"] == (
-        "A IA retornou sugestões em formato inválido."
-    )
+    assert "A IA retornou sugestões em formato inválido." in response.json()["detail"]
 
 
 def test_suggestions_handles_ollama_unavailable() -> None:
@@ -171,9 +169,7 @@ def test_suggestions_handles_ollama_unavailable() -> None:
         )
 
     assert response.status_code == 503
-    assert response.json()["detail"] == (
-        "Serviço de sugestões indisponível."
-    )
+    assert "Serviço de sugestões indisponível." in response.json()["detail"]
 
 
 def test_suggestions_returns_504_on_timeout() -> None:

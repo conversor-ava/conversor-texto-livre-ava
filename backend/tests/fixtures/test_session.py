@@ -3,22 +3,29 @@ import os
 
 os.environ["DATABASE_URL"] = "mysql+asyncmy://usuario:senha@localhost:3306/teste"
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine  
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-from app.core.config import Settings  
-from app.db.base import Base  
-from app.db.models import Geracao, StatusGeracao 
-from app.db.session import AsyncSessionLocal, engine 
+from app.core.config import Settings
+from app.db.base import Base
+from app.db.models import Geracao, StatusGeracao
+from app.db.session import AsyncSessionLocal, create_session_factory
+
 
 def test_settings_le_database_url_do_ambiente(monkeypatch):
     url = "mysql+asyncmy://outro:outra@db:3306/outro_banco"
     monkeypatch.setenv("DATABASE_URL", url)
 
-    assert Settings().database_url == url
+    assert Settings(_env_file=None).database_url == url
+
 
 def test_engine_usa_o_driver_assincrono_do_mysql():
-    assert engine.url.drivername == "mysql+asyncmy"
-    assert engine.url.database == "teste"
+    engine_teste, _ = create_session_factory(
+        "mysql+asyncmy://usuario:senha@localhost:3306/teste"
+    )
+    assert engine_teste is not None
+    assert engine_teste.url.drivername == "mysql+asyncmy"
+    assert engine_teste.url.database == "teste"
+
 
 def test_objeto_continua_acessivel_apos_commit_e_dados_sao_gravados():
     async def cenario():
@@ -46,9 +53,3 @@ def test_objeto_continua_acessivel_apos_commit_e_dados_sao_gravados():
             await engine_teste.dispose()
 
     asyncio.run(cenario())
-
-
-
-
-
-

@@ -117,9 +117,7 @@ def test_rag_endpoint_handles_embedding_error(
     )
 
     assert response.status_code == 503
-    assert response.json()["detail"] == (
-        "Serviço de sugestões com RAG indisponível."
-    )
+    assert "Serviço de sugestões com RAG indisponível." in response.json()["detail"]
 
 
 def test_rag_endpoint_handles_invalid_ai_response(

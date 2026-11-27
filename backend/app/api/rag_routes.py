@@ -22,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/rag", tags=["rag"])
 
+MAX_RAG_CHARS = 100_000
+
 
 class RAGSuggestionRequest(BaseModel):
     texto: str = Field(min_length=1)
@@ -39,6 +41,16 @@ class RAGSuggestionRequest(BaseModel):
 async def generate_rag_suggestions(
     request: RAGSuggestionRequest,
 ) -> QuestionSetSchema:
+    if len(request.texto) > MAX_RAG_CHARS:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"O material fornecido excede o limite de {MAX_RAG_CHARS} caracteres "
+                f"({len(request.texto)} enviados). Envie apenas os capítulos ou seções "
+                "relacionados ao tema desejado."
+            ),
+        )
+
     parametros = {
         "modo": "rag",
         "tema": request.tema,
@@ -76,7 +88,10 @@ async def generate_rag_suggestions(
         )
         raise HTTPException(
             status_code=502,
-            detail="A IA retornou sugestões em formato inválido.",
+            detail=(
+                "A IA retornou sugestões em formato inválido. "
+                "Tente gerar novamente ou refine o tema pesquisado."
+            ),
         ) from exc
 
     except ValueError as exc:
@@ -107,7 +122,10 @@ async def generate_rag_suggestions(
         )
         raise HTTPException(
             status_code=503,
-            detail="Serviço de sugestões com RAG indisponível.",
+            detail=(
+                "Serviço de sugestões com RAG indisponível. "
+                "Verifique se o Ollama e o modelo de embeddings estão ativos ou use o modo manual."
+            ),
         ) from exc
 
     await persistir_geracao_best_effort(
