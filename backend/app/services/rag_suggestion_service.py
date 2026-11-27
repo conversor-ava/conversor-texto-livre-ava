@@ -41,6 +41,7 @@ async def suggest_questions_with_rag(
 
     return await suggest_questions(
         texto=contexto,
+        tema=tema,
         quantidade=quantidade,
         dificuldade=dificuldade,
         alternativas=alternativas,

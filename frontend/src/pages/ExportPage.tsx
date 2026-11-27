@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   ArrowDownToLine,
   ArrowLeft,
@@ -15,29 +16,130 @@ import { useEvaluation } from '../hooks/useEvaluation'
 import { validateQuestions } from '../utils/validation'
 import './ExportPage.css'
 
+function stripControlChars(value: string): string {
+  return Array.from(value)
+    .filter(ch => {
+      const code = ch.charCodeAt(0)
+      if (code === 9 || code === 10 || code === 13) {
+        return true
+      }
+      return code >= 32 && code !== 127
+    })
+    .join('')
+    .trim()
+}
+
+function escapeXmlText(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function buildMoodleDescriptionXml(title: string, text: string): string {
+  const sanitizedText = escapeXmlText(stripControlChars(text)).replace(
+    /]]>/g,
+    ']]]]><![CDATA[>'
+  )
+  const sanitizedTitle = escapeXmlText(stripControlChars(title))
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="description">
+    <name>
+      <text>${sanitizedTitle || 'Material de Estudo'}</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="font-family: sans-serif; line-height: 1.6; white-space: pre-wrap;">${sanitizedText}</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>0.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+  </question>
+</quiz>`
+}
+
+function downloadXmlDirect(content: string, filename: string) {
+  const blob = new Blob([content], { type: 'application/xml;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  document.body.append(anchor)
+  try {
+    anchor.click()
+  } finally {
+    anchor.remove()
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+}
+
 export function ExportPage() {
-  const { questions, exportXml, busy } = useEvaluation()
+  const { questions, exportXml, busy, config } = useEvaluation()
+  const [exportingLocal, setExportingLocal] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const hasQuestions = questions.length > 0
+  const hasTextContent = Boolean(config.text && config.text.trim().length > 0)
 
-  const problem = hasQuestions
-    ? validateQuestions(questions)
-    : 'A exportação de materiais sem questões ainda não está disponível.'
-
-  const isReady = !problem
-  const isExporting = busy === 'export'
+  const validationProblem = hasQuestions ? validateQuestions(questions) : null
+  const isReady = hasQuestions ? !validationProblem : hasTextContent
+  const isExporting = busy === 'export' || exportingLocal
 
   async function download() {
-    if (isReady) {
+    if (!isReady || isExporting) {
+      return
+    }
+
+    setErrorMessage(null)
+
+    if (hasQuestions) {
       await exportXml()
+      return
+    }
+
+    if (hasTextContent) {
+      setExportingLocal(true)
+      try {
+        const descriptionXml = buildMoodleDescriptionXml(
+          config.filename || 'Material de Estudo',
+          config.text
+        )
+        downloadXmlDirect(descriptionXml, 'material_moodle.xml')
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setErrorMessage(err.message)
+        } else {
+          setErrorMessage('Não foi possível gerar o arquivo para o Moodle.')
+        }
+      } finally {
+        setExportingLocal(false)
+      }
     }
   }
 
-  const statusMessage = !hasQuestions
-    ? 'Você pode preparar materiais sem incluir questões. A opção de baixar apenas o texto estará disponível em uma próxima atualização.'
-    : problem
-      ? problem
-      : 'Seu material foi conferido e está pronto para ser baixado e utilizado no Moodle.'
+  const statusTitle = isReady
+    ? 'Tudo pronto para baixar!'
+    : hasQuestions
+      ? 'Vamos conferir alguns detalhes?'
+      : 'Nenhum conteúdo para exportar'
+
+  const statusMessage = isReady
+    ? hasQuestions
+      ? 'Seu material com questões foi conferido e está pronto para ser utilizado no Moodle.'
+      : 'Seu material em texto foi convertido para o formato de descrição Moodle XML e está pronto para download.'
+    : validationProblem || 'Adicione um texto ou questões na etapa de preparação antes de exportar.'
+
+  const fileLabel = hasQuestions
+    ? `${questions.length} ${questions.length === 1 ? 'questão' : 'questões'} · Moodle XML`
+    : hasTextContent
+      ? 'Material em texto · Moodle XML'
+      : '0 questões · Moodle XML'
+
+  const fileName = hasQuestions ? 'questoes_moodle.xml' : 'material_moodle.xml'
 
   return (
     <div className="export-page">
@@ -87,25 +189,34 @@ export function ExportPage() {
                   )}
 
                   {isReady
-                    ? 'Material conferido'
-                    : hasQuestions
-                      ? 'Falta só mais um passo'
-                      : 'Material sem questões'}
+                    ? hasQuestions
+                      ? 'Material conferido'
+                      : 'Texto convertido para AVA'
+                    : 'Atenção'}
                 </span>
 
-                <h2>
-                  {isReady
-                    ? 'Tudo pronto para baixar!'
-                    : hasQuestions
-                      ? 'Vamos conferir alguns detalhes?'
-                      : 'Seu material está preparado'}
-                </h2>
+                <h2>{statusTitle}</h2>
 
-                <p>
-                  {statusMessage}
-                </p>
+                <p>{statusMessage}</p>
               </div>
             </div>
+
+            {errorMessage && (
+              <div
+                role="alert"
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  color: '#ef4444',
+                  fontSize: '0.9rem',
+                  margin: '16px 0 0'
+                }}
+              >
+                {errorMessage}
+              </div>
+            )}
 
             <div className="export-file-section">
               <div className="export-file-heading">
@@ -120,15 +231,8 @@ export function ExportPage() {
                 </div>
 
                 <div className="download-file-info">
-                  <strong>questoes_moodle.xml</strong>
-
-                  <small>
-                    {questions.length}{' '}
-                    {questions.length === 1
-                      ? 'questão'
-                      : 'questões'}{' '}
-                    · Moodle XML
-                  </small>
+                  <strong>{fileName}</strong>
+                  <small>{fileLabel}</small>
                 </div>
 
                 {isReady && (
@@ -180,9 +284,9 @@ export function ExportPage() {
               <h3>Você mantém o controle do conteúdo</h3>
 
               <p>
-                As questões são organizadas em um arquivo
-                compatível com o Moodle, sem necessidade
-                de utilizar inteligência artificial.
+                As questões e conteúdos são organizados em um arquivo
+                compatível com o Moodle, sem dependência obrigatória
+                de inteligência artificial.
               </p>
             </div>
           </section>

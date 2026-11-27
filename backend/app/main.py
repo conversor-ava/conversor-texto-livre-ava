@@ -15,6 +15,7 @@ from app.repositories.geracao import (
 )
 from app.schemas import QuestionSetSchema
 from app.services.question_suggestion import suggest_questions
+from app.services.text_quiz_parser import parse_free_text_questions
 from app.services.xml_converter import convert_to_moodle_xml
 
 logger = logging.getLogger(__name__)
@@ -23,6 +24,7 @@ DEFAULT_CORS_ORIGINS = (
     "http://localhost:5173,http://127.0.0.1:5173,"
     "http://localhost:4173,http://127.0.0.1:4173"
 )
+MAX_SIMPLE_IA_CHARS = 15000
 
 
 def _get_cors_origins() -> list[str]:
@@ -58,6 +60,11 @@ class SuggestionRequest(BaseModel):
     alternativas: int = Field(default=4, ge=2, le=8)
 
 
+class ParseTextRequest(BaseModel):
+    texto: str = Field(min_length=1)
+    categoria: str | None = None
+
+
 @app.get("/health", tags=["health"])
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -77,6 +84,24 @@ async def convert_questions(question_set: QuestionSetSchema) -> Response:
 
 
 @app.post(
+    "/api/parse-text",
+    tags=["conversion"],
+    response_model=QuestionSetSchema,
+)
+async def parse_text_route(request: ParseTextRequest) -> QuestionSetSchema:
+    try:
+        return parse_free_text_questions(
+            texto=request.texto,
+            categoria_padrao=request.categoria,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
+
+
+@app.post(
     "/api/suggestions",
     tags=["suggestions"],
     response_model=QuestionSetSchema,
@@ -84,6 +109,15 @@ async def convert_questions(question_set: QuestionSetSchema) -> Response:
 async def generate_suggestions(
     request: SuggestionRequest,
 ) -> QuestionSetSchema:
+    if len(request.texto) > MAX_SIMPLE_IA_CHARS:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"O texto fornecido é muito extenso ({len(request.texto)} caracteres) para o modo IA Simples. "
+                "Para materiais longos como livros ou apostilas, utilize o modo RAG ou a conversão direta de questões."
+            ),
+        )
+
     parametros = {
         "modo": "simples",
         "quantidade": request.quantidade,

@@ -39,6 +39,18 @@
   min-width: 0;
 }
 
+.generate-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -10px;
+}
+
+.generate-example-btn {
+  font-size: 12px;
+  padding: 6px 14px;
+  gap: 7px;
+}
+
 /* =========================================
    TÍTULOS DOS PAINÉIS
 ========================================= */
@@ -154,6 +166,16 @@
   margin-top: 22px;
 }
 
+.generate-error-alert {
+  padding: 13px 16px;
+  border-radius: var(--radius-md);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 /* =========================================
    AÇÕES
 ========================================= */
@@ -162,15 +184,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
   padding: 6px 0 12px;
+  flex-wrap: wrap;
 }
 
 .generate-security {
   display: flex;
   align-items: center;
   gap: 10px;
-  max-width: 310px;
+  max-width: 280px;
 
   color: var(--color-text-secondary);
   font-size: 11px;
@@ -180,6 +203,13 @@
 .generate-security svg {
   flex-shrink: 0;
   color: var(--color-success);
+}
+
+.generate-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .generate-submit {
@@ -323,8 +353,6 @@
    AJUSTES DO TEMA ESCURO
 ========================================= */
 
-/* Área de upload */
-
 [data-theme='dark'] .generate-page .dropzone:hover {
   background: var(--color-surface-hover);
   border-color: var(--color-primary);
@@ -341,7 +369,11 @@
   color: var(--color-success);
 }
 
-/* Opções de criação */
+[data-theme='dark'] .generate-error-alert {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
 
 [data-theme='dark'] .generate-page .mode-card:hover {
   background: var(--color-surface-hover);
@@ -356,8 +388,6 @@
 [data-theme='dark'] .generate-page .mode-card.selected span {
   color: #a9d9d8;
 }
-
-/* Painel de orientações */
 
 [data-theme='dark'] .generate-info {
   background: #20383d;
@@ -431,6 +461,15 @@
     align-items: stretch;
     flex-direction: column;
     gap: 16px;
+  }
+
+  .generate-buttons-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .generate-buttons-group .button {
+    width: 100%;
   }
 
   .generate-security {

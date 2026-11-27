@@ -10,6 +10,7 @@ const base = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 const TIMEOUT = {
   health: 10000,
   extract: 60000,
+  parse: 30000,
   generate: 180000,
   export: 60000
 }
@@ -154,6 +155,28 @@ export async function extractDocument(
   )
 
   return readJson<ExtractedDocument>(response)
+}
+
+export async function parseTextQuestions(
+  texto: string,
+  categoria?: string
+): Promise<QuestionSet> {
+  const response = await request(
+    '/api/parse-text',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        texto,
+        categoria: categoria || undefined
+      })
+    },
+    TIMEOUT.parse
+  )
+
+  return readJson<QuestionSet>(response)
 }
 
 export async function suggestQuestions(
