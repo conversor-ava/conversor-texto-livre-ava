@@ -202,6 +202,8 @@ export function EvaluationProvider({
       return false
     }
 
+    // A criação de questões é opcional.
+    // No modo manual, o professor pode continuar sem gerar questões.
     if (config.mode === 'manual') {
       return true
     }
@@ -291,6 +293,8 @@ export function EvaluationProvider({
       return false
     }
 
+    // A exportação atual continua utilizando questões estruturadas.
+    // A conversão de textos sem questões será implementada no backend.
     const error = validateQuestions(questions)
 
     if (error) {

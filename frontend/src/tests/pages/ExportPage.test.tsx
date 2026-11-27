@@ -30,7 +30,7 @@ vi.mock('../../services/api', () => ({
 }))
 
 function Seed() {
-  const { setQuestions, updateConfig } = useEvaluation()
+  const { setQuestions } = useEvaluation()
 
   function seed() {
     const question = emptyQuestion(1, 2)
@@ -53,21 +53,10 @@ function Seed() {
     setQuestions([question])
   }
 
-  function seedText() {
-    updateConfig({
-      text: 'Conteúdo de estudo sobre conjuntos numéricos.',
-      filename: 'resumo.txt'
-    })
-  }
-
   return (
     <>
       <button type="button" onClick={seed}>
         Questão válida
-      </button>
-
-      <button type="button" onClick={seedText}>
-        Texto válido
       </button>
 
       <ExportPage />
@@ -100,7 +89,7 @@ function setup() {
 }
 
 describe('página de exportação', () => {
-  it('bloqueia o download quando não existem questões nem texto', () => {
+  it('bloqueia o download quando não existem questões', () => {
     setup()
 
     const downloadButton = screen.getByRole('button', {
@@ -112,16 +101,16 @@ describe('página de exportação', () => {
     expect(exportMoodleXml).not.toHaveBeenCalled()
   })
 
-  it('orienta o professor quando o material está vazio', () => {
+  it('orienta o professor quando o material não possui questões', () => {
     setup()
 
     expect(
-      screen.getByText('Nenhum conteúdo para exportar')
+      screen.getByText('Seu material está preparado')
     ).toBeInTheDocument()
 
     expect(
       screen.getByText(
-        /Adicione um texto ou questões na etapa de preparação antes de exportar/i
+        /A opção de baixar apenas o texto estará disponível/i
       )
     ).toBeInTheDocument()
 
@@ -130,45 +119,6 @@ describe('página de exportação', () => {
         name: /Baixar arquivo para o Moodle/i
       })
     ).toBeDisabled()
-  })
-
-  it('permite baixar apenas o texto convertido para Moodle XML quando não há questões', () => {
-    const createObjectUrlMock = vi.fn(() => 'blob:moodle-xml')
-    const revokeObjectUrlMock = vi.fn()
-    vi.stubGlobal('URL', {
-      ...URL,
-      createObjectURL: createObjectUrlMock,
-      revokeObjectURL: revokeObjectUrlMock
-    })
-
-    setup()
-
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: 'Texto válido'
-      })
-    )
-
-    expect(
-      screen.getByText('Texto convertido para AVA')
-    ).toBeInTheDocument()
-
-    expect(
-      screen.getByText('material_moodle.xml')
-    ).toBeInTheDocument()
-
-    const downloadButton = screen.getByRole('button', {
-      name: /Baixar arquivo para o Moodle/i
-    })
-
-    expect(downloadButton).toBeEnabled()
-
-    fireEvent.click(downloadButton)
-
-    expect(createObjectUrlMock).toHaveBeenCalledTimes(1)
-    expect(suggestQuestions).not.toHaveBeenCalled()
-
-    vi.unstubAllGlobals()
   })
 
   it('envia questões válidas ao conversor sem solicitar IA', async () => {

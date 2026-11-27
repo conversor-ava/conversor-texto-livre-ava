@@ -80,7 +80,6 @@ class InMemoryVectorStore:
         self,
         query_embedding: list[float],
         top_k: int = 3,
-        min_similarity: float | None = None,
     ) -> list[SearchResult]:
         if top_k <= 0:
             raise ValueError("top_k deve ser maior que zero.")
@@ -96,11 +95,13 @@ class InMemoryVectorStore:
         ):
             raise ValueError("Vetor de consulta inválido.")
 
-        results = []
-        for chunk, embedding in self._entries:
-            score = cosine_similarity(query_embedding, embedding)
-            if min_similarity is None or score >= min_similarity:
-                results.append(SearchResult(chunk=chunk, score=score))
+        results = [
+            SearchResult(
+                chunk=chunk,
+                score=cosine_similarity(query_embedding, embedding),
+            )
+            for chunk, embedding in self._entries
+        ]
 
         return sorted(
             results,

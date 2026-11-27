@@ -1,9 +1,11 @@
 import math
+import os
 
 import httpx
 
-from app.core.config import settings
-
+DEFAULT_EMBED_MODEL = "nomic-embed-text"
+DEFAULT_OLLAMA_URL = "http://localhost:11434"
+DEFAULT_EMBED_TIMEOUT = 180.0
 MAX_EMBED_BATCH_SIZE = 16
 
 
@@ -22,12 +24,14 @@ class OllamaEmbeddingService:
         base_url: str | None = None,
         timeout: float | None = None,
     ) -> None:
-        self.model = model or settings.ollama_embed_model
-        self.base_url = (base_url or settings.ollama_base_url).rstrip("/")
+        self.model = model or os.getenv("OLLAMA_EMBED_MODEL", DEFAULT_EMBED_MODEL)
+        self.base_url = (
+            base_url or os.getenv("OLLAMA_BASE_URL", DEFAULT_OLLAMA_URL)
+        ).rstrip("/")
         self.timeout = (
             timeout
             if timeout is not None
-            else settings.ollama_timeout_seconds
+            else float(os.getenv("OLLAMA_TIMEOUT_SECONDS", DEFAULT_EMBED_TIMEOUT))
         )
 
     async def _embed_batch(self, texts: list[str]) -> list[list[float]]:

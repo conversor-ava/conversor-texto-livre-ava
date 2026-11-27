@@ -1,29 +1,24 @@
-import inspect
 import json
-import logging
 import re
-
-from pydantic import ValidationError
 
 from app.llm.base import LLMProvider
 from app.schemas import QuestionSchema, QuestionSetSchema
 from app.services.prompt_builder import build_question_prompt
 
-logger = logging.getLogger(__name__)
-
 MAX_QUESTIONS_PER_BATCH = 5
-MAX_BATCH_RETRIES = 3
 
 
 def _remove_markdown_fence(texto: str) -> str:
     texto = texto.strip()
 
-    if texto.startswith("```") and texto.endswith("```"):
-        linhas = texto.splitlines()
-        if len(linhas) >= 2:
-            primeira = linhas[0].strip().lower()
-            if primeira in {"```", "```json"}:
-                return "\n".join(linhas[1:-1]).strip()
+    match = re.fullmatch(
+        r"```(?:json)?\s*\n(.*?)\n```",
+        texto,
+        flags=re.DOTALL | re.IGNORECASE,
+    )
+
+    if match:
+        return match.group(1).strip()
 
     return texto
 
@@ -82,17 +77,6 @@ def _extract_json_payload(texto: str) -> str:
     return limpo
 
 
-async def _call_provider(
-    provider: LLMProvider,
-    prompt: str,
-    seed: int | None = None,
-) -> str:
-    sig = inspect.signature(provider.generate)
-    if "seed" in sig.parameters:
-        return await provider.generate(prompt, seed=seed)
-    return await provider.generate(prompt)
-
-
 async def _generate_batch(
     texto: str,
     quantidade: int,
@@ -100,8 +84,6 @@ async def _generate_batch(
     alternativas: int,
     provider: LLMProvider,
     questoes_evitar: list[str] | None = None,
-    tema: str | None = None,
-    batch_index: int = 0,
 ) -> QuestionSetSchema:
     prompt = build_question_prompt(
         texto=texto,
@@ -109,38 +91,18 @@ async def _generate_batch(
         dificuldade=dificuldade,
         alternativas=alternativas,
         questoes_evitar=questoes_evitar,
-        tema=tema,
     )
 
-    ultimo_erro: ValidationError | None = None
-    ultima_resposta: str | None = None
+    resposta = await provider.generate(prompt)
+    payload = _extract_json_payload(resposta)
 
-    for tentativa in range(1, MAX_BATCH_RETRIES + 1):
-        seed = (batch_index * 1000) + tentativa
-        resposta = await _call_provider(provider, prompt, seed=seed)
-        ultima_resposta = resposta
-        payload = _extract_json_payload(resposta)
-
-        try:
-            return QuestionSetSchema.model_validate_json(
-                payload,
-                context={
-                    "quantidade_questoes": quantidade,
-                    "quantidade_alternativas": alternativas,
-                },
-            )
-        except ValidationError as exc:
-            ultimo_erro = exc
-            logger.warning(
-                "Tentativa %d/%d do lote %d falhou na validação Pydantic.",
-                tentativa,
-                MAX_BATCH_RETRIES,
-                batch_index + 1,
-            )
-
-    assert ultimo_erro is not None
-    setattr(ultimo_erro, "raw_response", ultima_resposta)
-    raise ultimo_erro
+    return QuestionSetSchema.model_validate_json(
+        payload,
+        context={
+            "quantidade_questoes": quantidade,
+            "quantidade_alternativas": alternativas,
+        },
+    )
 
 
 async def suggest_questions(
@@ -149,7 +111,6 @@ async def suggest_questions(
     dificuldade: str,
     alternativas: int,
     provider: LLMProvider,
-    tema: str | None = None,
 ) -> QuestionSetSchema:
     if quantidade <= MAX_QUESTIONS_PER_BATCH:
         return await _generate_batch(
@@ -158,13 +119,17 @@ async def suggest_questions(
             dificuldade=dificuldade,
             alternativas=alternativas,
             provider=provider,
-            tema=tema,
-            batch_index=0,
         )
+
+    build_question_prompt(
+        texto=texto,
+        quantidade=quantidade,
+        dificuldade=dificuldade,
+        alternativas=alternativas,
+    )
 
     questoes_acumuladas: list[QuestionSchema] = []
     restante = quantidade
-    batch_index = 0
 
     while restante > 0:
         lote = min(restante, MAX_QUESTIONS_PER_BATCH)
@@ -179,12 +144,9 @@ async def suggest_questions(
             alternativas=alternativas,
             provider=provider,
             questoes_evitar=questoes_evitar,
-            tema=tema,
-            batch_index=batch_index,
         )
         questoes_acumuladas.extend(resultado_lote.questions)
         restante -= lote
-        batch_index += 1
 
     return QuestionSetSchema.model_validate(
         {"questions": [questao.model_dump() for questao in questoes_acumuladas]},

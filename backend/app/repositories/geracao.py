@@ -7,13 +7,6 @@ from app.db.models import Alternativa, Geracao, Questao, StatusGeracao
 from app.schemas import QuestionSetSchema
 
 logger = logging.getLogger(__name__)
-MAX_DB_TEXT_LEN = 60000
-
-
-def _ajustar_texto_base(texto: str) -> str:
-    if len(texto) > MAX_DB_TEXT_LEN:
-        return texto[:MAX_DB_TEXT_LEN]
-    return texto
 
 
 def montar_geracao(*, texto_base: str, parametros: dict, conjunto: QuestionSetSchema) -> Geracao:
@@ -39,7 +32,7 @@ def montar_geracao(*, texto_base: str, parametros: dict, conjunto: QuestionSetSc
         )
 
     return Geracao(
-        texto_base=_ajustar_texto_base(texto_base),
+        texto_base=texto_base,
         parametros=dict(parametros),
         status=StatusGeracao.CONCLUIDA,
         questoes=questoes,
@@ -56,17 +49,12 @@ async def salvar_geracao(
 
 
 async def registrar_falha(
-    session: AsyncSession,
-    *,
-    texto_base: str,
-    parametros: dict,
-    resposta_bruta_ia: str | None = None,
+    session: AsyncSession, *, texto_base: str, parametros: dict
 ) -> Geracao:
     geracao = Geracao(
-        texto_base=_ajustar_texto_base(texto_base),
+        texto_base=texto_base,
         parametros=dict(parametros),
         status=StatusGeracao.FALHA,
-        resposta_bruta_ia=resposta_bruta_ia,
     )
     session.add(geracao)
     await session.commit()
@@ -115,17 +103,13 @@ async def persistir_geracao_best_effort(
 
 
 async def persistir_falha_best_effort(
-    *,
-    texto_base: str,
-    parametros: dict,
-    resposta_bruta_ia: str | None = None,
+    *, texto_base: str, parametros: dict
 ) -> bool:
     return await _executar_persistencia_best_effort(
         lambda session: registrar_falha(
             session,
             texto_base=texto_base,
             parametros=parametros,
-            resposta_bruta_ia=resposta_bruta_ia,
         ),
         "falha na geração",
     )

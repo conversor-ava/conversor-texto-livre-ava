@@ -12,5 +12,5 @@ class LLMTimeoutError(LLMGenerationError):
 class LLMProvider(ABC):
 
     @abstractmethod
-    async def generate(self, prompt: str, seed: int | None = None) -> str:
+    async def generate(self, prompt: str) -> str:
         pass

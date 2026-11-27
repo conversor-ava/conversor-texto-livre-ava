@@ -50,7 +50,6 @@ async def test_rag_suggestion_success(
 
     suggest_mock.assert_awaited_once_with(
         texto="MySQL é um banco de dados relacional.",
-        tema="Bancos de dados",
         quantidade=3,
         dificuldade="medio",
         alternativas=4,

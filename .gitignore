@@ -190,7 +190,6 @@ __marimo__/
 # ---------- Ambientes virtuais ----------
 .venv/
 venv/
-.venv-antiga/
 
 # ---------- Ferramentas de qualidade ----------
 .pytest_cache/
