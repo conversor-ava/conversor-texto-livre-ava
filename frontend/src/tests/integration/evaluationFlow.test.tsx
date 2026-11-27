@@ -68,8 +68,6 @@ describe('integração do fluxo do conversor', () => {
 
     setup()
 
-    // O modo manual é selecionado por padrão.
-    // Continuar não deve solicitar sugestões à IA.
     fireEvent.click(
       screen.getByRole('button', {
         name: /Continuar/i
@@ -80,14 +78,12 @@ describe('integração do fluxo do conversor', () => {
       await screen.findByText('Questões do material')
     ).toBeInTheDocument()
 
-    // Nenhuma questão deve ser criada automaticamente.
     expect(
       screen.getByText('Deseja adicionar questões?')
     ).toBeInTheDocument()
 
     expect(suggestQuestions).not.toHaveBeenCalled()
 
-    // O professor decide adicionar uma questão.
     fireEvent.click(
       screen.getAllByRole('button', {
         name: /Adicionar questão/i
@@ -167,10 +163,9 @@ describe('integração do fluxo do conversor', () => {
     expect(suggestQuestions).not.toHaveBeenCalled()
   })
 
-  it('permite continuar sem questões, mas mantém a exportação indisponível', async () => {
+  it('permite continuar sem questões nem texto e mantém a exportação bloqueada', async () => {
     setup()
 
-    // Avança na preparação sem gerar questões.
     fireEvent.click(
       screen.getByRole('button', {
         name: /Continuar/i
@@ -181,7 +176,6 @@ describe('integração do fluxo do conversor', () => {
       await screen.findByText('Deseja adicionar questões?')
     ).toBeInTheDocument()
 
-    // Avança sem adicionar questões.
     fireEvent.click(
       screen.getByRole('button', {
         name: /Continuar sem questões/i
@@ -189,7 +183,7 @@ describe('integração do fluxo do conversor', () => {
     )
 
     expect(
-      await screen.findByText('Seu material está preparado')
+      await screen.findByText('Nenhum conteúdo para exportar')
     ).toBeInTheDocument()
 
     const downloadButton = screen.getByRole(

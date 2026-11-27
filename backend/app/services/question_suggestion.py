@@ -11,14 +11,12 @@ MAX_QUESTIONS_PER_BATCH = 5
 def _remove_markdown_fence(texto: str) -> str:
     texto = texto.strip()
 
-    match = re.fullmatch(
-        r"```(?:json)?\s*\n(.*?)\n```",
-        texto,
-        flags=re.DOTALL | re.IGNORECASE,
-    )
-
-    if match:
-        return match.group(1).strip()
+    if texto.startswith("```") and texto.endswith("```"):
+        linhas = texto.splitlines()
+        if len(linhas) >= 2:
+            primeira = linhas[0].strip().lower()
+            if primeira in {"```", "```json"}:
+                return "\n".join(linhas[1:-1]).strip()
 
     return texto
 
@@ -84,6 +82,7 @@ async def _generate_batch(
     alternativas: int,
     provider: LLMProvider,
     questoes_evitar: list[str] | None = None,
+    tema: str | None = None,
 ) -> QuestionSetSchema:
     prompt = build_question_prompt(
         texto=texto,
@@ -91,6 +90,7 @@ async def _generate_batch(
         dificuldade=dificuldade,
         alternativas=alternativas,
         questoes_evitar=questoes_evitar,
+        tema=tema,
     )
 
     resposta = await provider.generate(prompt)
@@ -111,6 +111,7 @@ async def suggest_questions(
     dificuldade: str,
     alternativas: int,
     provider: LLMProvider,
+    tema: str | None = None,
 ) -> QuestionSetSchema:
     if quantidade <= MAX_QUESTIONS_PER_BATCH:
         return await _generate_batch(
@@ -119,6 +120,7 @@ async def suggest_questions(
             dificuldade=dificuldade,
             alternativas=alternativas,
             provider=provider,
+            tema=tema,
         )
 
     build_question_prompt(
@@ -126,6 +128,7 @@ async def suggest_questions(
         quantidade=quantidade,
         dificuldade=dificuldade,
         alternativas=alternativas,
+        tema=tema,
     )
 
     questoes_acumuladas: list[QuestionSchema] = []
@@ -144,6 +147,7 @@ async def suggest_questions(
             alternativas=alternativas,
             provider=provider,
             questoes_evitar=questoes_evitar,
+            tema=tema,
         )
         questoes_acumuladas.extend(resultado_lote.questions)
         restante -= lote
