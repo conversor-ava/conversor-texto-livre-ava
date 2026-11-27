@@ -30,7 +30,7 @@ c) SELECT (correta)
 d) DELETE`
 
 export function GeneratePage() {
-  const { config, updateConfig, generate, busy } = useEvaluation()
+  const { config, questions, updateConfig, generate, busy } = useEvaluation()
   const navigate = useNavigate()
 
   const isManual = config.mode === 'manual'
@@ -39,6 +39,15 @@ export function GeneratePage() {
   async function handleContinue() {
     if (busy !== null) {
       return
+    }
+
+    if (questions.length > 0) {
+      const confirmed = window.confirm(
+        'Já existem questões carregadas na revisão. Continuar irá substituir suas questões e edições atuais. Deseja prosseguir?'
+      )
+      if (!confirmed) {
+        return
+      }
     }
 
     const success = await generate()

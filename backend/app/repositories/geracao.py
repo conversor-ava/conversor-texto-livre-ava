@@ -56,12 +56,17 @@ async def salvar_geracao(
 
 
 async def registrar_falha(
-    session: AsyncSession, *, texto_base: str, parametros: dict
+    session: AsyncSession,
+    *,
+    texto_base: str,
+    parametros: dict,
+    resposta_bruta_ia: str | None = None,
 ) -> Geracao:
     geracao = Geracao(
         texto_base=_ajustar_texto_base(texto_base),
         parametros=dict(parametros),
         status=StatusGeracao.FALHA,
+        resposta_bruta_ia=resposta_bruta_ia,
     )
     session.add(geracao)
     await session.commit()
@@ -110,13 +115,17 @@ async def persistir_geracao_best_effort(
 
 
 async def persistir_falha_best_effort(
-    *, texto_base: str, parametros: dict
+    *,
+    texto_base: str,
+    parametros: dict,
+    resposta_bruta_ia: str | None = None,
 ) -> bool:
     return await _executar_persistencia_best_effort(
         lambda session: registrar_falha(
             session,
             texto_base=texto_base,
             parametros=parametros,
+            resposta_bruta_ia=resposta_bruta_ia,
         ),
         "falha na geração",
     )

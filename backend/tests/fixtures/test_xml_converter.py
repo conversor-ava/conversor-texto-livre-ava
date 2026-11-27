@@ -143,7 +143,19 @@ def test_sanitiza_caracteres_de_controle_e_escapa_especiais() -> None:
 
     assert questao is not None
     assert questao.find("name/text").text == "Operadores <>&"
-    assert questao.find("questiontext/text").text == "Se x < 5 & y > 2, qual o resultado?"
-    assert questao.find("answer[@fraction='100']/text").text == "x < y & z > 0"
-    assert questao.find("answer[@fraction='100']/feedback/text").text == 'Correto: <tag> & "aspas".'
-    assert raiz.find("question[@type='category']/category/text").text == "$course$/top/Lógica & Conjuntos"
+    assert (
+        questao.find("questiontext/text").text
+        == "Se x &lt; 5 &amp; y &gt; 2, qual o resultado?"
+    )
+    assert (
+        questao.find("answer[@fraction='100']/text").text
+        == "x &lt; y &amp; z &gt; 0"
+    )
+    assert (
+        questao.find("answer[@fraction='100']/feedback/text").text
+        == 'Correto: &lt;tag&gt; &amp; "aspas".'
+    )
+    assert (
+        raiz.find("question[@type='category']/category/text").text
+        == "$course$/top/Lógica & Conjuntos"
+    )

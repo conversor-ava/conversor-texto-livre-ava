@@ -7,12 +7,19 @@ import type {
 
 const base = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
+const MAX_QUESTIONS_PER_BATCH = 5
+
 const TIMEOUT = {
   health: 10000,
   extract: 60000,
   parse: 30000,
   generate: 180000,
   export: 60000
+}
+
+function getGenerationTimeout(quantidade: number): number {
+  const batches = Math.max(1, Math.ceil((quantidade || 1) / MAX_QUESTIONS_PER_BATCH))
+  return batches * TIMEOUT.generate
 }
 
 async function apiError(response: Response): Promise<never> {
@@ -207,7 +214,7 @@ export async function suggestQuestions(
       },
       body: JSON.stringify(payload)
     },
-    TIMEOUT.generate
+    getGenerationTimeout(params.quantidade)
   )
 
   return readJson<QuestionSet>(response)

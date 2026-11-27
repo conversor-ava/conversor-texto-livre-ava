@@ -72,6 +72,7 @@ async def generate_rag_suggestions(
         await persistir_falha_best_effort(
             texto_base=request.texto,
             parametros=parametros,
+            resposta_bruta_ia=getattr(exc, "raw_response", None),
         )
         raise HTTPException(
             status_code=502,

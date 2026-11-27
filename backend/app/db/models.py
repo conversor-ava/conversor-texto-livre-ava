@@ -7,10 +7,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 
+
 class StatusGeracao(str, enum.Enum):
     PENDENTE = "pendente"
     CONCLUIDA = "concluida"
     FALHA = "falha"
+
 
 class Geracao(Base):
     __tablename__ = "geracoes"
@@ -22,12 +24,18 @@ class Geracao(Base):
         default=lambda: datetime.now(timezone.utc)
     )
     status: Mapped[StatusGeracao] = mapped_column(default=StatusGeracao.PENDENTE)
+    resposta_bruta_ia: Mapped[str | None] = mapped_column(
+        Text().with_variant(LONGTEXT(), "mysql"),
+        nullable=True,
+        default=None,
+    )
 
     questoes: Mapped[list["Questao"]] = relationship(
-        back_populates="geracao", 
+        back_populates="geracao",
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+
 
 class Questao(Base):
     __tablename__ = "questoes"
@@ -40,12 +48,13 @@ class Questao(Base):
     tipo: Mapped[str] = mapped_column(String(50), default="multipla_escolha")
     geracao_id: Mapped[int] = mapped_column(ForeignKey("geracoes.id", ondelete="CASCADE"))
     geracao: Mapped["Geracao"] = relationship(back_populates="questoes")
-    
+
     alternativas: Mapped[list["Alternativa"]] = relationship(
         back_populates="questao",
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+
 
 class Alternativa(Base):
     __tablename__ = "alternativas"
@@ -57,4 +66,3 @@ class Alternativa(Base):
     questao_id: Mapped[int] = mapped_column(ForeignKey("questoes.id", ondelete="CASCADE"))
 
     questao: Mapped["Questao"] = relationship(back_populates="alternativas")
-
